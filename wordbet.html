@@ -252,49 +252,9 @@
       font-size: 0.8rem;
     }
 
-    /* result section */
+    /* result section - HIDDEN */
     .result{
-      display:none; text-align:left; padding:14px; border-radius:12px;
-      background:linear-gradient(180deg, rgba(1,33,51,.85), rgba(1,26,40,.85));
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow: var(--glow);
-    }
-    .result.win{outline:2px solid rgba(25,195,125,.45)}
-    .result.lose{outline:2px solid rgba(242,95,92,.45)}
-    .result .big{font-size:0.9rem;margin:4px 0 6px; font-weight:900}
-    .result-list{margin-top:8px;display:grid;gap:4px}
-    .result-item{
-      display:grid;grid-template-columns:1fr auto;align-items:center; gap:6px;
-      padding:6px;border-radius:6px;
-      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
-      font-weight:800;
-      font-size: 0.8rem;
-    }
-    .tag{padding:2px 4px;border-radius:999px;font-size:0.7rem;font-weight:900}
-    .tag.win{background:rgba(25,195,125,.18);border:1px solid rgba(25,195,125,.45);color:#bff3dd}
-    .tag.lose{background:rgba(242,95,92,.18);border:1px solid rgba(242,95,92,.45);color:#ffd3d2}
-    
-    /* Word bag display in results */
-    .word-bag-display {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin: 12px 0;
-      padding: 8px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .letter-chip {
-      width: 28px;
-      height: 28px;
-      display: grid;
-      place-items: center;
-      border-radius: 6px;
-      background: linear-gradient(145deg, rgba(168,230,207,.20), rgba(168,230,207,.08));
-      border: 1px solid rgba(168,230,207,.35);
-      font-weight: 900;
-      font-size: 0.9rem;
+      display:none;
     }
 
     footer{opacity:.8;text-align:center;margin-top:4px; font-size: 0.7rem;}
@@ -502,140 +462,6 @@
     .history-result.lose {
       color: var(--bad);
     }
-    
-    /* Result Screen Styles */
-    .result-screen {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 4000;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(8px);
-      padding: 20px;
-      overflow-y: auto;
-    }
-    .result-card {
-      background: linear-gradient(180deg, rgba(1,33,51,.95), rgba(1,26,40,.95));
-      border-radius: 20px;
-      border: 2px solid rgba(255,255,255,0.1);
-      box-shadow: 0 25px 80px rgba(0,0,0,0.5);
-      max-width: 800px;
-      margin: 0 auto;
-      overflow: hidden;
-      animation: slideUp 0.5s ease-out;
-    }
-    @keyframes slideUp {
-      from { transform: translateY(50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .result-header {
-      background: linear-gradient(90deg, var(--bg1), var(--bg2));
-      padding: 20px;
-      text-align: center;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    .result-title {
-      font-size: 2rem;
-      font-weight: 900;
-      letter-spacing: 2px;
-      background: linear-gradient(90deg, var(--mint), #d7f7e9);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
-    .result-subtitle {
-      font-size: 1rem;
-      opacity: 0.9;
-      font-weight: 600;
-    }
-    .result-body {
-      padding: 20px;
-    }
-    .result-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    .result-section {
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      padding: 15px;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .result-section h3 {
-      color: var(--mint);
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .result-value {
-      font-size: 1.2rem;
-      font-weight: 800;
-    }
-    .result-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: 800;
-      font-size: 0.8rem;
-      margin-top: 5px;
-    }
-    .result-badge.win {
-      background: rgba(25,195,125,0.2);
-      color: #bff3dd;
-      border: 1px solid rgba(25,195,125,0.5);
-    }
-    .result-badge.lose {
-      background: rgba(242,95,92,0.2);
-      color: #ffd3d2;
-      border: 1px solid rgba(242,95,92,0.5);
-    }
-    .words-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .word-badge {
-      padding: 6px 10px;
-      background: rgba(168,230,207,0.15);
-      border: 1px solid rgba(168,230,207,0.3);
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.8rem;
-    }
-    .word-badge.valid {
-      background: rgba(25,195,125,0.15);
-      border-color: rgba(25,195,125,0.4);
-    }
-    .word-badge.invalid {
-      background: rgba(242,95,92,0.15);
-      border-color: rgba(242,95,92,0.4);
-    }
-    .result-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      padding: 20px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-    .close-result {
-      background: transparent;
-      color: var(--txt);
-      border: 1px solid rgba(255,255,255,0.3);
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 700;
-      transition: all 0.2s ease;
-    }
-    .close-result:hover {
-      background: rgba(255,255,255,0.1);
-    }
 
     /* Media queries for larger screens */
     @media (min-width: 768px) {
@@ -783,58 +609,12 @@
       </section>
     </div>
 
-    <!-- Result / countdown -->
+    <!-- Result section - HIDDEN -->
     <section id="result" class="result" aria-live="polite">
-      <h2>Result</h2>
-      <div id="result-msg" class="big"></div>
-      <div id="word-bag-result" class="word-bag-display"></div>
-      <div id="result-list" class="result-list"></div>
+      <!-- This section is now hidden and won't show results to the user -->
     </section>
 
     <footer><p>From ENGLAGIP powered by AITECH • <span id="footer-game-name">Dewdrop</span> Challenge © 2025 • Ocean Blue Edition • Crafted for clarity, speed, and thrill.</p></footer>
-  </div>
-
-  <!-- Result Screen -->
-  <div id="result-screen" class="result-screen">
-    <div class="result-card">
-      <div class="result-header">
-        <div class="result-title" id="rs-game-name">DEWDROP</div>
-        <div class="result-subtitle">Game Result</div>
-      </div>
-      <div class="result-body">
-        <div class="result-grid">
-          <div class="result-section">
-            <h3>Betting Amount</h3>
-            <div class="result-value" id="rs-bet-amount">₦0</div>
-          </div>
-          <div class="result-section">
-            <h3>Word Bag</h3>
-            <div class="words-list" id="rs-word-bag"></div>
-          </div>
-          <div class="result-section">
-            <h3>Words Played</h3>
-            <div class="words-list" id="rs-words-played"></div>
-          </div>
-          <div class="result-section">
-            <h3>Result</h3>
-            <div class="result-value" id="rs-result">₦0</div>
-            <div class="result-badge" id="rs-badge">Win</div>
-          </div>
-          <div class="result-section">
-            <h3>Date & Time</h3>
-            <div class="result-value" id="rs-date-time">-</div>
-          </div>
-          <div class="result-section">
-            <h3>Balance</h3>
-            <div class="result-value" id="rs-balance">₦0</div>
-          </div>
-        </div>
-      </div>
-      <div class="result-actions">
-        <button id="close-result" class="close-result">Close</button>
-        <button id="share-result" class="btn">Share Result</button>
-      </div>
-    </div>
   </div>
 
   <!-- Help modal -->
@@ -1003,9 +783,6 @@
     grid: document.getElementById('word-grid'),
     bet: document.getElementById('bet-amount'),
     result: document.getElementById('result'),
-    resultMsg: document.getElementById('result-msg'),
-    resultList: document.getElementById('result-list'),
-    wordBagResult: document.getElementById('word-bag-result'),
     search: document.getElementById('search-words'),
     toast: document.getElementById('toast'),
     hintModal: document.getElementById('hint-modal'),
@@ -1039,24 +816,12 @@
     historyList: document.getElementById('history-list'),
     historyClose: document.getElementById('history-close'),
     noHistory: document.getElementById('no-history'),
-    resultScreen: document.getElementById('result-screen'),
-    rsBetAmount: document.getElementById('rs-bet-amount'),
-    rsWordBag: document.getElementById('rs-word-bag'),
-    rsWordsPlayed: document.getElementById('rs-words-played'),
-    rsResult: document.getElementById('rs-result'),
-    rsBadge: document.getElementById('rs-badge'),
-    rsDateTime: document.getElementById('rs-date-time'),
-    rsBalance: document.getElementById('rs-balance'),
-    closeResult: document.getElementById('close-result'),
-    shareResult: document.getElementById('share-result'),
     gameName: document.getElementById('game-name'),
     gameTitle: document.getElementById('game-title'),
     gameSubtitle: document.getElementById('game-subtitle'),
     keyLetter: document.getElementById('key-letter'),
     sessionTime: document.getElementById('session-time'),
     footerGameName: document.getElementById('footer-game-name'),
-    rsGameName: document.getElementById('rs-game-name'),
-    helpKeyLetter: document.getElementById('help-key-letter'),
     wordListTitle: document.getElementById('word-list-title')
   };
 
@@ -1155,7 +920,6 @@
     
     els.sessionTime.textContent = `${formatTime(session.start)} – ${formatTime(session.end)}`;
     els.footerGameName.textContent = session.name;
-    els.rsGameName.textContent = session.name.toUpperCase();
     els.wordListTitle.textContent = `${session.keyLetter}-Words`;
   }
 
@@ -1273,20 +1037,10 @@
   function setLettersBag(letters){
     els.bag.textContent = letters.map(x=>x.toUpperCase()).join(" ");
   }
-  
-  function displayWordBag(letters) {
-    els.wordBagResult.innerHTML = "";
-    letters.forEach(letter => {
-      const chip = document.createElement('div');
-      chip.className = 'letter-chip';
-      chip.textContent = letter.toUpperCase();
-      els.wordBagResult.appendChild(chip);
-    });
-  }
 
   function startNewRound(){
+    // Hide result section completely
     els.result.style.display="none";
-    els.result.classList.remove('win','lose');
     roundActive=true;
     hintUsed = false;
     updateReview();
@@ -1320,8 +1074,13 @@
     startTimer();
   }
 
-  // Save bet history to Firestore under the user's document
-  async function saveBetToFirestore(result) {
+  // Generate unique reference ID
+  function generateRef() {
+    return 'REF' + Date.now() + Math.random().toString(36).substr(2, 9).toUpperCase();
+  }
+
+  // Save comprehensive bet data to Firestore
+  async function saveBetToFirestore(result, net) {
     if (!currentUser) {
       console.error("No user logged in");
       return;
@@ -1329,24 +1088,54 @@
     
     try {
       const session = getCurrentGameSession();
+      const betAmount = parseInt(els.bet.value, 10);
+      const ref = generateRef();
+      const status = net >= 0 ? 'WIN' : 'LOSE';
+      
       const betData = {
+        // User Information
+        userId: currentUser.uid,
+        userName: currentUser.displayName || currentUser.email,
+        userEmail: currentUser.email,
+        
+        // Game Information
+        gameName: session ? session.name : "Unknown",
+        keyLetter: session ? session.keyLetter : "Unknown",
         date: new Date().toISOString(),
-        words: slip,
-        betAmount: parseInt(els.bet.value, 10),
-        result: result,
-        balance: balance,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        
+        // Bet Information
+        betId: ref,
+        betAmount: betAmount,
+        wordsPlayed: slip,
+        wordsCount: slip.length,
+        totalBet: betAmount * slip.length,
+        
+        // Result Information
+        status: status,
+        amountWonLost: net,
+        finalBalance: balance,
+        
+        // Game Data
         wordBag: availableLetters,
         validWords: validWords,
-        gameSession: session ? session.name : "Unknown",
-        keyLetter: session ? session.keyLetter : "Unknown",
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        wordsArranged: slip.map(word => ({
+          word: word,
+          isValid: validWords.includes(word),
+          points: validWords.includes(word) ? betAmount : -betAmount
+        })),
+        
+        // Additional Fields
+        reward: net > 0 ? net : 0,
+        ref: ref,
+        session: session ? `${session.start} - ${session.end}` : "Unknown"
       };
       
       // Save to user's bet_history subcollection
       await db.collection('users').doc(currentUser.uid)
         .collection('bet_history').add(betData);
         
-      console.log("Bet saved to user's Firestore history");
+      console.log("Comprehensive bet data saved to Firestore");
       return betData;
     } catch (error) {
       console.error("Error saving bet to Firestore:", error);
@@ -1400,15 +1189,15 @@
         
         const gameSession = document.createElement('div');
         gameSession.className = 'history-words';
-        gameSession.textContent = `${bet.gameSession} (${bet.keyLetter}) - ${bet.words.map(w => w.toUpperCase()).join(', ')}`;
+        gameSession.textContent = `${bet.gameName} (${bet.keyLetter}) - ${bet.wordsPlayed.map(w => w.toUpperCase()).join(', ')}`;
         
         left.appendChild(date);
         left.appendChild(gameSession);
         
         const right = document.createElement('div');
         const result = document.createElement('div');
-        result.className = `history-result ${bet.result >= 0 ? 'win' : 'lose'}`;
-        result.textContent = (bet.result >= 0 ? '+' : '') + formatMoney(bet.result);
+        result.className = `history-result ${bet.status === 'WIN' ? 'win' : 'lose'}`;
+        result.textContent = (bet.amountWonLost >= 0 ? '+' : '') + formatMoney(bet.amountWonLost);
         
         right.appendChild(result);
         
@@ -1421,72 +1210,288 @@
     els.historyModal.style.display = 'grid';
   }
 
-  // Save words formed from letters bag to Firestore under the user's document
-  async function saveWordsToFirestore() {
-    if (!currentUser) {
-      console.error("No user logged in");
-      return;
-    }
-    
+  // Load dictionary from multiple sources for better word fetching
+  async function loadDict(){
     try {
       const session = getCurrentGameSession();
-      const wordsData = {
-        letters: availableLetters,
-        validWords: validWords,
-        gameSession: session ? session.name : "Unknown",
-        keyLetter: session ? session.keyLetter : "Unknown",
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      };
+      if (!session) {
+        throw new Error("No game session found");
+      }
       
-      // Save to user's word_combinations subcollection
-      await db.collection('users').doc(currentUser.uid)
-        .collection('word_combinations').add(wordsData);
-        
-      console.log("Words saved to user's Firestore");
+      const letter = session.dictLetter.toLowerCase();
+      let allWords = [];
+      
+      // Try multiple word sources
+      const wordSources = [
+        // Common English words starting with the letter
+        getCommonWords(letter),
+        // Try to fetch from any available API
+        fetchWordsFromAnyAPI(letter),
+        // Use built-in comprehensive dictionary as fallback
+        getComprehensiveDictionary(letter)
+      ];
+      
+      // Try each source until we get words
+      for (const source of wordSources) {
+        try {
+          const words = await source;
+          if (words && words.length > 0) {
+            allWords = [...allWords, ...words];
+            break; // Stop at first successful source
+          }
+        } catch (e) {
+          console.log("Source failed, trying next...");
+        }
+      }
+      
+      // Remove duplicates and filter by starting letter
+      const uniqueWords = [...new Set(allWords)].filter(w => w.startsWith(letter) && w.length >= 3);
+      
+      if (uniqueWords.length > 0) {
+        notify(`Loaded ${uniqueWords.length} words for ${letter.toUpperCase()}!`);
+        return uniqueWords;
+      } else {
+        throw new Error("No words found from any source");
+      }
     } catch (error) {
-      console.error("Error saving words to Firestore:", error);
+      console.error("Failed to load dictionary:", error);
+      notify("Using comprehensive fallback dictionary", "error");
+      return getComprehensiveDictionary();
     }
   }
 
-  // Show result screen
-  function showResultScreen(resultData) {
-    // Update result screen data
-    els.rsBetAmount.textContent = formatMoney(resultData.betAmount);
+  // Get common English words
+  function getCommonWords(letter) {
+    const commonWords = {
+      'a': ["about", "above", "after", "again", "agent", "agree", "ahead", "allow", "alone", "along", "among", "anger", "angle", "angry", "apart", "apple", "apply", "arena", "argue", "arise", "array", "asset", "avoid", "award", "aware"],
+      'b': ["badly", "baker", "bases", "basic", "beach", "began", "begin", "begun", "being", "below", "bench", "billy", "birth", "black", "blame", "blind", "block", "blood", "board", "boost", "booth", "bound", "brain", "brand", "bread"],
+      'c': ["cable", "calif", "carry", "catch", "cause", "chain", "chair", "chart", "chase", "cheap", "check", "chest", "chief", "child", "china", "chose", "civil", "claim", "class", "clean", "clear", "click", "clock", "close", "coach"],
+      'd': ["daily", "dance", "dated", "dealt", "death", "debut", "delay", "depth", "doing", "doubt", "dozen", "draft", "drama", "drawn", "dream", "dress", "drill", "drink", "drive", "drove", "dying"],
+      'e': ["eager", "early", "earth", "eight", "elite", "empty", "enemy", "enjoy", "enter", "entry", "equal", "error", "event", "every", "exact", "exist", "extra"],
+      'f': ["faith", "false", "fault", "fiber", "field", "fifth", "fifty", "fight", "final", "first", "fixed", "flash", "fleet", "floor", "fluid", "focus", "force", "forth", "forty", "forum", "found", "frame", "frank", "fraud", "fresh"],
+      'g': ["giant", "given", "glass", "globe", "going", "grace", "grade", "grand", "grant", "grass", "great", "green", "gross", "group", "grown", "guard", "guess", "guest", "guide"],
+      'h': ["happy", "harry", "heart", "heavy", "hence", "henry", "horse", "hotel", "house", "human"],
+      'i': ["ideal", "image", "index", "inner", "input", "issue"],
+      'j': ["japan", "jimmy", "joint", "jones", "judge"],
+      'k': ["known"],
+      'l': ["label", "large", "laser", "later", "laugh", "layer", "learn", "lease", "least", "leave", "legal", "level", "lewis", "light", "limit", "links", "lives", "local", "logic", "loose", "lower", "lucky", "lunch", "lying"],
+      'm': ["magic", "major", "maker", "march", "maria", "match", "maybe", "mayor", "meant", "media", "metal", "might", "minor", "minus", "mixed", "model", "money", "month", "moral", "motor", "mount", "mouse", "mouth", "movie", "music"],
+      'n': ["needs", "never", "newly", "night", "noise", "north", "noted", "novel", "nurse"],
+      'o': ["ocean", "offer", "often", "order", "other", "ought"],
+      'p': ["paint", "panel", "paper", "party", "peace", "peter", "phase", "phone", "photo", "piece", "pilot", "pitch", "place", "plain", "plane", "plant", "plate", "point", "pound", "power", "press", "price", "pride", "prime", "print"],
+      'q': ["queen", "quick", "quiet", "quite"],
+      'r': ["radio", "raise", "range", "rapid", "ratio", "reach", "ready", "refer", "right", "rival", "river", "robin", "roger", "roman", "rough", "round", "route", "royal", "rural"],
+      's': ["scale", "scene", "scope", "score", "sense", "serve", "seven", "shall", "shape", "share", "sharp", "sheet", "shelf", "shell", "shift", "shirt", "shock", "shoot", "short", "shown", "sight", "since", "sixth", "sixty", "sized"],
+      't': ["table", "taken", "taste", "taxes", "teach", "terry", "texas", "thank", "theft", "their", "theme", "there", "these", "thick", "thing", "think", "third", "those", "three", "threw", "throw", "tight", "times", "tired", "title"],
+      'u': ["under", "undue", "union", "unity", "until", "upper", "upset", "urban", "usage", "usual"],
+      'v': ["valid", "value", "video", "virus", "visit", "vital", "voice"],
+      'w': ["waste", "watch", "water", "wheel", "where", "which", "while", "white", "whole", "whose", "woman", "women", "world", "worry", "worse", "worst", "worth", "would", "wound", "write", "wrong", "wrote"],
+      'x': ["xerox"],
+      'y': ["yield", "young", "youth"],
+      'z': ["zebra", "zero", "zone"]
+    };
     
-    // Display word bag
-    els.rsWordBag.innerHTML = '';
-    resultData.wordBag.forEach(letter => {
-      const chip = document.createElement('div');
-      chip.className = 'letter-chip';
-      chip.textContent = letter.toUpperCase();
-      els.rsWordBag.appendChild(chip);
+    return Promise.resolve(commonWords[letter] || []);
+  }
+
+  // Try to fetch words from any available API
+  async function fetchWordsFromAnyAPI(letter) {
+    // This is a placeholder for any word API you might want to use
+    // You can implement actual API calls here
+    return Promise.resolve([]);
+  }
+
+  // Comprehensive fallback dictionary
+  function getComprehensiveDictionary(letter = null) {
+    const allWords = [
+      "about", "above", "after", "again", "agent", "agree", "ahead", "allow", "alone", "along", 
+      "among", "anger", "angle", "angry", "apart", "apple", "apply", "arena", "argue", "arise", 
+      "array", "asset", "avoid", "award", "aware", "badly", "baker", "bases", "basic", "beach", 
+      "began", "begin", "begun", "being", "below", "bench", "billy", "birth", "black", "blame", 
+      "blind", "block", "blood", "board", "boost", "booth", "bound", "brain", "brand", "bread", 
+      "break", "breed", "brief", "bring", "broad", "broke", "brown", "build", "built", "buyer", 
+      "cable", "calif", "carry", "catch", "cause", "chain", "chair", "chart", "chase", "cheap", 
+      "check", "chest", "chief", "child", "china", "chose", "civil", "claim", "class", "clean", 
+      "clear", "click", "clock", "close", "coach", "coast", "could", "count", "court", "cover", 
+      "craft", "crash", "cream", "crime", "cross", "crowd", "crown", "curve", "cycle", "daily", 
+      "dance", "dated", "dealt", "death", "debut", "delay", "depth", "doing", "doubt", "dozen", 
+      "draft", "drama", "drawn", "dream", "dress", "drill", "drink", "drive", "drove", "dying", 
+      "eager", "early", "earth", "eight", "elite", "empty", "enemy", "enjoy", "enter", "entry", 
+      "equal", "error", "event", "every", "exact", "exist", "extra", "faith", "false", "fault", 
+      "fiber", "field", "fifth", "fifty", "fight", "final", "first", "fixed", "flash", "fleet", 
+      "floor", "fluid", "focus", "force", "forth", "forty", "forum", "found", "frame", "frank", 
+      "fraud", "fresh", "front", "fruit", "fully", "funny", "giant", "given", "glass", "globe", 
+      "going", "grace", "grade", "grand", "grant", "grass", "great", "green", "gross", "group", 
+      "grown", "guard", "guess", "guest", "guide", "happy", "harry", "heart", "heavy", "hence", 
+      "henry", "horse", "hotel", "house", "human", "ideal", "image", "index", "inner", "input", 
+      "issue", "japan", "jimmy", "joint", "jones", "judge", "known", "label", "large", "laser", 
+      "later", "laugh", "layer", "learn", "lease", "least", "leave", "legal", "level", "lewis", 
+      "light", "limit", "links", "lives", "local", "logic", "loose", "lower", "lucky", "lunch", 
+      "lying", "magic", "major", "maker", "march", "maria", "match", "maybe", "mayor", "meant", 
+      "media", "metal", "might", "minor", "minus", "mixed", "model", "money", "month", "moral", 
+      "motor", "mount", "mouse", "mouth", "movie", "music", "needs", "never", "newly", "night", 
+      "noise", "north", "noted", "novel", "nurse", "occur", "ocean", "offer", "often", "order", 
+      "other", "ought", "paint", "panel", "paper", "party", "peace", "peter", "phase", "phone", 
+      "photo", "piece", "pilot", "pitch", "place", "plain", "plane", "plant", "plate", "point", 
+      "pound", "power", "press", "price", "pride", "prime", "print", "prior", "prize", "proof", 
+      "proud", "prove", "queen", "quick", "quiet", "quite", "radio", "raise", "range", "rapid", 
+      "ratio", "reach", "ready", "refer", "right", "rival", "river", "robin", "roger", "roman", 
+      "rough", "round", "route", "royal", "rural", "scale", "scene", "scope", "score", "sense", 
+      "serve", "seven", "shall", "shape", "share", "sharp", "sheet", "shelf", "shell", "shift", 
+      "shirt", "shock", "shoot", "short", "shown", "sight", "since", "sixth", "sixty", "sized", 
+      "skill", "sleep", "slide", "small", "smart", "smile", "smith", "smoke", "solid", "solve", 
+      "sorry", "sound", "south", "space", "spare", "speak", "speed", "spend", "spent", "split", 
+      "spoke", "sport", "staff", "stage", "stake", "stand", "start", "state", "steam", "steel", 
+      "stick", "still", "stock", "stone", "stood", "store", "storm", "story", "strip", "stuck", 
+      "study", "stuff", "style", "sugar", "suite", "super", "sweet", "table", "taken", "taste", 
+      "taxes", "teach", "terry", "texas", "thank", "theft", "their", "theme", "there", "these", 
+      "thick", "thing", "think", "third", "those", "three", "threw", "throw", "tight", "times", 
+      "tired", "title", "today", "topic", "total", "touch", "tough", "tower", "track", "trade", 
+      "train", "treat", "trend", "trial", "tried", "tries", "truck", "truly", "trust", "truth", 
+      "twice", "under", "undue", "union", "unity", "until", "upper", "upset", "urban", "usage", 
+      "usual", "valid", "value", "video", "virus", "visit", "vital", "voice", "waste", "watch", 
+      "water", "wheel", "where", "which", "while", "white", "whole", "whose", "woman", "women", 
+      "world", "worry", "worse", "worst", "worth", "would", "wound", "write", "wrong", "wrote", 
+      "yield", "young", "youth"
+    ];
+    
+    if (letter) {
+      return allWords.filter(word => word.startsWith(letter));
+    }
+    return allWords;
+  }
+
+  // ---- EVENTS ----
+  els.addWord.addEventListener('click', ()=>{ 
+    notify("Please select words from the word list");
+  });
+  els.clearSlip.addEventListener('click', clearSlip);
+  els.bet.addEventListener('input', renderSlip);
+  els.logoutBtn.addEventListener('click', logout);
+  els.historyBtn.addEventListener('click', showBetHistory);
+  els.historyClose.addEventListener('click', () => {
+    els.historyModal.style.display = 'none';
+  });
+  
+  // Three Words Button
+  els.threeWordsBtn.addEventListener('click', () => {
+    window.location.href = 'dewdrop3.html';
+  });
+
+  document.getElementById('submit-btn').addEventListener('click', async ()=>{
+    if(!roundActive){
+      notify("Round finished. Start a new one.", "error");
+      return;
+    }
+
+    if(slip.length===0){ notify("Add at least one word to bet on","error"); return; }
+
+    const bet = parseInt(els.bet.value,10);
+    if(isNaN(bet) || bet<50){ notify("Minimum bet is ₦50", "error"); return; }
+    const totalCost = bet * slip.length;
+    if(totalCost>balance){ notify("Insufficient balance for all words", "error"); return; }
+
+    roundActive=false;
+
+    // Evaluate each word
+    let net = 0;
+    slip.forEach(w=>{
+      const ok = validWords.includes(w);
+      net += ok ? bet : -bet;
     });
+
+    balance += net;
+    els.balance.textContent = currency + balance;
     
-    // Display words played with validation status
-    els.rsWordsPlayed.innerHTML = '';
-    resultData.words.forEach(word => {
-      const badge = document.createElement('div');
-      const isValid = resultData.validWords.includes(word);
-      badge.className = `word-badge ${isValid ? 'valid' : 'invalid'}`;
-      badge.textContent = word.toUpperCase();
-      els.rsWordsPlayed.appendChild(badge);
-    });
+    // Update user balance in Firestore
+    if (currentUser) {
+      try {
+        await db.collection('users').doc(currentUser.uid).update({
+          balance: balance
+        });
+      } catch (error) {
+        console.error("Error updating user balance:", error);
+      }
+    }
     
-    // Display result
-    els.rsResult.textContent = (resultData.result >= 0 ? '+' : '') + formatMoney(resultData.result);
+    // Save comprehensive data to Firestore
+    await saveBetToFirestore(net >= 0 ? 'WIN' : 'LOSE', net);
+
+    // Show success message without revealing results
+    if (net > 0) {
+      notify("✅ Bet placed successfully! Check your history for details.");
+    } else if (net < 0) {
+      notify("✅ Bet placed successfully! Check your history for details.");
+    } else {
+      notify("✅ Bet placed successfully! Check your history for details.");
+    }
     
-    // Update badge
-    els.rsBadge.textContent = resultData.result >= 0 ? 'WIN' : 'LOSE';
-    els.rsBadge.className = `result-badge ${resultData.result >= 0 ? 'win' : 'lose'}`;
+    // Start new round immediately
+    updateReview();
+    startNewRound();
+  });
+
+  // search
+  let tId=null;
+  els.search.addEventListener('input', (e)=>{
+    const q=e.target.value.toLowerCase();
+    clearTimeout(tId);
+    tId=setTimeout(()=>{
+      const session = getCurrentGameSession();
+      if (!session) return;
+      
+      const currentDictWords = dict.filter(w => w.startsWith(session.dictLetter.toLowerCase()) && w.length>=3);
+      const filtered = currentDictWords.filter(w => w.includes(q) && w.length>=3);
+      renderGrid(filtered.slice(0,30));
+    },120);
+  });
+
+  // help
+  els.helpBtn.addEventListener('click', ()=> els.helpModal.style.display='grid');
+  els.helpOk.addEventListener('click', ()=> els.helpModal.style.display='none');
+
+  // hint
+  document.getElementById('hint-btn').addEventListener('click', async ()=>{
+    if (!keyword) return;
     
-    // Display date and time
-    els.rsDateTime.textContent = new Date(resultData.date).toLocaleString();
+    if (hintUsed) {
+      const watched = await showAdForHint();
+      if (!watched) return;
+    }
     
-    // Display balance
-    els.rsBalance.textContent = formatMoney(resultData.balance);
-    
-    // Show result screen
-    els.resultScreen.style.display = 'block';
+    const hintLetter = keyword[rand(keyword.length)].toUpperCase();
+    els.hintText.innerHTML = `💡 The keyword contains the letter <b>${hintLetter}</b>`;
+    els.hintModal.style.display='grid';
+    hintUsed = true;
+  });
+  document.getElementById('hint-ok').addEventListener('click', ()=> els.hintModal.style.display='none');
+
+  // music toggle
+  function syncMusicUI(){
+    const on = !els.bg.paused;
+    els.musicToggle.setAttribute('aria-pressed', String(on));
+    els.musicToggle.querySelector('span').textContent = on ? "Sound On" : "Sound Off";
+    els.musicToggle.querySelector('i').className = on ? "fa-solid fa-music" : "fa-solid fa-music-slash";
+  }
+  els.musicToggle.addEventListener('click', async ()=>{
+    if(els.bg.paused){ try{ await els.bg.play(); }catch(e){} } else { els.bg.pause(); }
+    syncMusicUI();
+  });
+
+  // bubbles
+  function spawnBubbles(){
+    const n = 18;
+    for(let i=0;i<n;i++){
+      const b = document.createElement('div');
+      b.className='bubble';
+      const size = 10 + Math.random()*26;
+      b.style.width = size+'px';
+      b.style.height = size+'px';
+      b.style.left = (Math.random()*100)+'%';
+      b.style.setProperty('--dur', (12 + Math.random()*18) + 's');
+      b.style.animationDelay = (-Math.random()*20)+'s';
+      els.bubbles.appendChild(b);
+    }
   }
 
   // Load ads from Firestore
@@ -1604,316 +1609,6 @@
     });
   }
 
-  // Twinword API configuration
-  const TWINWORD_API_URL = "https://twinword-word-graph-dictionary.p.rapidapi.com/theme/";
-  const TWINWORD_API_KEY = "85d3a04b31msh655c52a9fab147ep15ea6bjsn7cd4480fe67c";
-
-  // Fetch words from Twinword API
-  async function fetchWordsFromAPI(letter) {
-    try {
-      const response = await fetch(`${TWINWORD_API_URL}?entry=${letter}`, {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-host': 'twinword-word-graph-dictionary.p.rapidapi.com',
-          'x-rapidapi-key': TWINWORD_API_KEY
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.result_code === '200' && data.theme) {
-        // Extract words from the theme response
-        const words = data.theme.map(item => item.word.toLowerCase()).filter(word => word.startsWith(letter));
-        return words;
-      } else {
-        throw new Error('Invalid API response');
-      }
-    } catch (error) {
-      console.error("Error fetching words from Twinword API:", error);
-      throw error;
-    }
-  }
-
-  // Load dictionary using Twinword API with fallback
-  async function loadDict(){
-    try {
-      const session = getCurrentGameSession();
-      if (!session) {
-        throw new Error("No game session found");
-      }
-      
-      // Try to fetch words from Twinword API
-      const apiWords = await fetchWordsFromAPI(session.dictLetter.toLowerCase());
-      
-      if (apiWords && apiWords.length > 0) {
-        notify(`Loaded ${apiWords.length} words from dictionary!`);
-        return apiWords;
-      } else {
-        throw new Error("No words returned from API");
-      }
-    } catch (error) {
-      console.error("Failed to load dictionary from API:", error);
-      notify("Check your internet connection. Using fallback dictionary.", "error");
-      
-      // Return comprehensive fallback dictionary
-      return [
-        // Common words starting with various letters
-        "about", "above", "after", "again", "agent", "agree", "ahead", "allow", "alone", "along", 
-        "among", "anger", "angle", "angry", "apart", "apple", "apply", "arena", "argue", "arise", 
-        "array", "asset", "avoid", "award", "aware", "badly", "baker", "bases", "basic", "beach", 
-        "began", "begin", "begun", "being", "below", "bench", "billy", "birth", "black", "blame", 
-        "blind", "block", "blood", "board", "boost", "booth", "bound", "brain", "brand", "bread", 
-        "break", "breed", "brief", "bring", "broad", "broke", "brown", "build", "built", "buyer", 
-        "cable", "calif", "carry", "catch", "cause", "chain", "chair", "chart", "chase", "cheap", 
-        "check", "chest", "chief", "child", "china", "chose", "civil", "claim", "class", "clean", 
-        "clear", "click", "clock", "close", "coach", "coast", "could", "count", "court", "cover", 
-        "craft", "crash", "cream", "crime", "cross", "crowd", "crown", "curve", "cycle", "daily", 
-        "dance", "dated", "dealt", "death", "debut", "delay", "depth", "doing", "doubt", "dozen", 
-        "draft", "drama", "drawn", "dream", "dress", "drill", "drink", "drive", "drove", "dying", 
-        "eager", "early", "earth", "eight", "elite", "empty", "enemy", "enjoy", "enter", "entry", 
-        "equal", "error", "event", "every", "exact", "exist", "extra", "faith", "false", "fault", 
-        "fiber", "field", "fifth", "fifty", "fight", "final", "first", "fixed", "flash", "fleet", 
-        "floor", "fluid", "focus", "force", "forth", "forty", "forum", "found", "frame", "frank", 
-        "fraud", "fresh", "front", "fruit", "fully", "funny", "giant", "given", "glass", "globe", 
-        "going", "grace", "grade", "grand", "grant", "grass", "great", "green", "gross", "group", 
-        "grown", "guard", "guess", "guest", "guide", "happy", "harry", "heart", "heavy", "hence", 
-        "henry", "horse", "hotel", "house", "human", "ideal", "image", "index", "inner", "input", 
-        "issue", "japan", "jimmy", "joint", "jones", "judge", "known", "label", "large", "laser", 
-        "later", "laugh", "layer", "learn", "lease", "least", "leave", "legal", "level", "lewis", 
-        "light", "limit", "links", "lives", "local", "logic", "loose", "lower", "lucky", "lunch", 
-        "lying", "magic", "major", "maker", "march", "maria", "match", "maybe", "mayor", "meant", 
-        "media", "metal", "might", "minor", "minus", "mixed", "model", "money", "month", "moral", 
-        "motor", "mount", "mouse", "mouth", "movie", "music", "needs", "never", "newly", "night", 
-        "noise", "north", "noted", "novel", "nurse", "occur", "ocean", "offer", "often", "order", 
-        "other", "ought", "paint", "panel", "paper", "party", "peace", "peter", "phase", "phone", 
-        "photo", "piece", "pilot", "pitch", "place", "plain", "plane", "plant", "plate", "point", 
-        "pound", "power", "press", "price", "pride", "prime", "print", "prior", "prize", "proof", 
-        "proud", "prove", "queen", "quick", "quiet", "quite", "radio", "raise", "range", "rapid", 
-        "ratio", "reach", "ready", "refer", "right", "rival", "river", "robin", "roger", "roman", 
-        "rough", "round", "route", "royal", "rural", "scale", "scene", "scope", "score", "sense", 
-        "serve", "seven", "shall", "shape", "share", "sharp", "sheet", "shelf", "shell", "shift", 
-        "shirt", "shock", "shoot", "short", "shown", "sight", "since", "sixth", "sixty", "sized", 
-        "skill", "sleep", "slide", "small", "smart", "smile", "smith", "smoke", "solid", "solve", 
-        "sorry", "sound", "south", "space", "spare", "speak", "speed", "spend", "spent", "split", 
-        "spoke", "sport", "staff", "stage", "stake", "stand", "start", "state", "steam", "steel", 
-        "stick", "still", "stock", "stone", "stood", "store", "storm", "story", "strip", "stuck", 
-        "study", "stuff", "style", "sugar", "suite", "super", "sweet", "table", "taken", "taste", 
-        "taxes", "teach", "terry", "texas", "thank", "theft", "their", "theme", "there", "these", 
-        "thick", "thing", "think", "third", "those", "three", "threw", "throw", "tight", "times", 
-        "tired", "title", "today", "topic", "total", "touch", "tough", "tower", "track", "trade", 
-        "train", "treat", "trend", "trial", "tried", "tries", "truck", "truly", "trust", "truth", 
-        "twice", "under", "undue", "union", "unity", "until", "upper", "upset", "urban", "usage", 
-        "usual", "valid", "value", "video", "virus", "visit", "vital", "voice", "waste", "watch", 
-        "water", "wheel", "where", "which", "while", "white", "whole", "whose", "woman", "women", 
-        "world", "worry", "worse", "worst", "worth", "would", "wound", "write", "wrong", "wrote", 
-        "yield", "young", "youth"
-      ];
-    }
-  }
-
-  // ---- EVENTS ----
-  els.addWord.addEventListener('click', ()=>{ 
-    // Since we removed the input field, this button is now just for adding words from the grid
-    notify("Please select words from the word list");
-  });
-  els.clearSlip.addEventListener('click', clearSlip);
-  els.bet.addEventListener('input', renderSlip);
-  els.logoutBtn.addEventListener('click', logout);
-  els.historyBtn.addEventListener('click', showBetHistory);
-  els.historyClose.addEventListener('click', () => {
-    els.historyModal.style.display = 'none';
-  });
-  
-  // Three Words Button
-  els.threeWordsBtn.addEventListener('click', () => {
-    window.location.href = 'dewdrop3.html';
-  });
-  
-  // Result Screen Events
-  els.closeResult.addEventListener('click', () => {
-    els.resultScreen.style.display = 'none';
-  });
-  
-  els.shareResult.addEventListener('click', () => {
-    // Simple share functionality
-    const shareText = `I just played ${els.rsGameName.textContent} and ${els.rsBadge.textContent === 'WIN' ? 'won' : 'lost'} ${els.rsResult.textContent}! Can you beat my score?`;
-    if (navigator.share) {
-      navigator.share({
-        title: `${els.rsGameName.textContent} Challenge Result`,
-        text: shareText,
-        url: window.location.href
-      });
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(shareText).then(() => {
-        notify("Result copied to clipboard!");
-      });
-    }
-  });
-
-  document.getElementById('submit-btn').addEventListener('click', async ()=>{
-    if(!roundActive){
-      notify("Round finished. Start a new one.", "error");
-      els.result.scrollIntoView({behavior:"smooth",block:"center"});
-      return;
-    }
-
-    if(slip.length===0){ notify("Add at least one word to bet on","error"); return; }
-
-    const bet = parseInt(els.bet.value,10);
-    if(isNaN(bet) || bet<50){ notify("Minimum bet is ₦50", "error"); return; }
-    const totalCost = bet * slip.length;
-    if(totalCost>balance){ notify("Insufficient balance for all words", "error"); return; }
-
-    els.result.style.display="block";
-    els.result.classList.remove('win','lose');
-    els.resultMsg.innerHTML = `⏳ Checking <b>${slip.length}</b> word(s)...`;
-    els.resultList.innerHTML = "";
-    displayWordBag(availableLetters);
-    els.result.scrollIntoView({behavior:"smooth",block:"start"});
-
-    roundActive=false;
-
-    // Evaluate each word
-    let net = 0;
-    slip.forEach(w=>{
-      const ok = validWords.includes(w);
-      const item = document.createElement('div');
-      item.className = 'result-item';
-      const left = document.createElement('div');
-      left.textContent = w.toUpperCase();
-      const right = document.createElement('div');
-      const tag = document.createElement('span');
-      tag.className = 'tag ' + (ok?'win':'lose');
-      tag.textContent = (ok ? '+' : '−') + currency + bet;
-      right.appendChild(tag);
-      item.appendChild(left);
-      item.appendChild(right);
-      els.resultList.appendChild(item);
-      net += ok ? bet : -bet;
-    });
-
-    balance += net;
-    els.balance.textContent = currency + balance;
-    
-    // Update user balance in Firestore
-    if (currentUser) {
-      try {
-        await db.collection('users').doc(currentUser.uid).update({
-          balance: balance
-        });
-      } catch (error) {
-        console.error("Error updating user balance:", error);
-      }
-    }
-    
-    // Save to Firestore and get result data
-    const resultData = await saveBetToFirestore(net);
-    await saveWordsToFirestore();
-
-    // Custom congratulations based on result
-    if (net > 0) {
-      els.result.classList.add('win');
-      if (net >= 500) {
-        els.resultMsg.innerHTML = `🎉 AMAZING! You won <b>+${currency}${net}</b>! You're a word master!`;
-      } else if (net >= 200) {
-        els.resultMsg.innerHTML = `🎉 GREAT JOB! You won <b>+${currency}${net}</b>! Keep it up!`;
-      } else {
-        els.resultMsg.innerHTML = `🎉 Well done! You netted <b>+${currency}${net}</b> on ${slip.length} word(s).`;
-      }
-      notify("✅ You won!");
-    } else if (net < 0) {
-      els.result.classList.add('lose');
-      if (net <= -500) {
-        els.resultMsg.innerHTML = `😢 Tough luck! You lost <b>${currency}${Math.abs(net)}</b>. Better luck next time!`;
-      } else if (net <= -200) {
-        els.resultMsg.innerHTML = `😕 Unfortunate! You lost <b>${currency}${Math.abs(net)}</b>. Try again!`;
-      } else {
-        els.resultMsg.innerHTML = `❌ Done! You lost <b>${currency}${Math.abs(net)}</b> on ${slip.length} word(s).`;
-      }
-      notify("✖️ Better luck next time");
-    } else {
-      els.resultMsg.innerHTML = `➖ Break even! No gain, no loss on ${slip.length} word(s).`;
-      notify("➖ Break even!");
-    }
-    
-    // Show result screen
-    if (resultData) {
-      showResultScreen(resultData);
-    }
-    
-    // Start new round immediately
-    updateReview();
-    startNewRound();
-  });
-
-  // search
-  let tId=null;
-  els.search.addEventListener('input', (e)=>{
-    const q=e.target.value.toLowerCase();
-    clearTimeout(tId);
-    tId=setTimeout(()=>{
-      const session = getCurrentGameSession();
-      if (!session) return;
-      
-      const currentDictWords = dict.filter(w => w.startsWith(session.dictLetter.toLowerCase()) && w.length>=3);
-      const filtered = currentDictWords.filter(w => w.includes(q) && w.length>=3);
-      renderGrid(filtered.slice(0,30));
-    },120);
-  });
-
-  // help
-  els.helpBtn.addEventListener('click', ()=> els.helpModal.style.display='grid');
-  els.helpOk.addEventListener('click', ()=> els.helpModal.style.display='none');
-
-  // hint
-  document.getElementById('hint-btn').addEventListener('click', async ()=>{
-    if (!keyword) return;
-    
-    if (hintUsed) {
-      const watched = await showAdForHint();
-      if (!watched) return;
-    }
-    
-    const hintLetter = keyword[rand(keyword.length)].toUpperCase();
-    els.hintText.innerHTML = `💡 The keyword contains the letter <b>${hintLetter}</b>`;
-    els.hintModal.style.display='grid';
-    hintUsed = true;
-  });
-  document.getElementById('hint-ok').addEventListener('click', ()=> els.hintModal.style.display='none');
-
-  // music toggle
-  function syncMusicUI(){
-    const on = !els.bg.paused;
-    els.musicToggle.setAttribute('aria-pressed', String(on));
-    els.musicToggle.querySelector('span').textContent = on ? "Sound On" : "Sound Off";
-    els.musicToggle.querySelector('i').className = on ? "fa-solid fa-music" : "fa-solid fa-music-slash";
-  }
-  els.musicToggle.addEventListener('click', async ()=>{
-    if(els.bg.paused){ try{ await els.bg.play(); }catch(e){} } else { els.bg.pause(); }
-    syncMusicUI();
-  });
-
-  // bubbles
-  function spawnBubbles(){
-    const n = 18;
-    for(let i=0;i<n;i++){
-      const b = document.createElement('div');
-      b.className='bubble';
-      const size = 10 + Math.random()*26;
-      b.style.width = size+'px';
-      b.style.height = size+'px';
-      b.style.left = (Math.random()*100)+'%';
-      b.style.setProperty('--dur', (12 + Math.random()*18) + 's');
-      b.style.animationDelay = (-Math.random()*20)+'s';
-      els.bubbles.appendChild(b);
-    }
-  }
-
   (async function init(){
     // Check authentication
     checkAuthState();
@@ -1923,7 +1618,7 @@
     if(!isNaN(saved) && saved>0){ balance = saved; }
     els.balance.textContent = currency + balance;
 
-    notify("Loading dictionary from Twinword API…");
+    notify("Loading dictionary…");
     try{
       dict = await loadDict();
       notify(`Dictionary loaded with ${dict.length} words!`);
