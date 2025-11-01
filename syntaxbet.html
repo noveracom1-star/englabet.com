@@ -511,7 +511,6 @@
             border-radius: 6px;
             border-left: 3px solid var(--accent);
             font-size: 0.7rem;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
         }
 
         .rules {
@@ -607,7 +606,7 @@
             border-radius: var(--border-radius);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
             width: 90%;
-            max-width: 600px;
+            max-width: 800px;
             max-height: 90vh;
             overflow-y: auto;
             padding: 20px;
@@ -694,7 +693,32 @@
             line-height: 1.4;
         }
 
-        /* Game Records Styles - moved to bottom */
+        /* Records Button */
+        .records-btn {
+            margin-top: 15px;
+            padding: 8px 12px;
+            background: var(--accent-gradient);
+            color: var(--primary);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+            width: 100%;
+            font-size: 0.8rem;
+        }
+
+        .records-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 201, 240, 0.6);
+        }
+
+        /* Game Records Styles */
         .records-container {
             margin-top: 15px;
             background: rgba(255, 255, 255, 0.1);
@@ -743,6 +767,171 @@
         .loss-amount {
             color: var(--danger);
             font-weight: bold;
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        .status.won {
+            background: rgba(76, 222, 128, 0.2);
+            color: #4ade80;
+        }
+
+        .status.lost {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        /* Records Modal Styles */
+        .records-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .records-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .records-modal-content {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 25px;
+            position: relative;
+            transform: translateY(20px);
+            transition: var(--transition);
+            font-size: 0.8rem;
+        }
+
+        .records-modal.active .records-modal-content {
+            transform: translateY(0);
+        }
+
+        .records-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .records-modal-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            color: var(--text-light);
+        }
+
+        .records-modal-title i {
+            color: var(--accent);
+        }
+
+        .records-modal-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .records-modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .records-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .record-stat {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .record-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .record-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-gray);
+        }
+
+        .records-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+        }
+
+        .records-table-modal {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .records-table-modal th {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-gray);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            background: rgba(26, 62, 117, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .records-table-modal td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .records-table-modal tr:last-child td {
+            border-bottom: none;
+        }
+
+        .records-table-modal tr:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
 
         /* Animations */
@@ -863,6 +1052,15 @@
             }
             
             .overlay-content {
+                padding: 15px;
+            }
+            
+            .records-stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .records-modal-content {
                 padding: 15px;
             }
         }
@@ -994,6 +1192,10 @@
                         <div class="score-label">Current Bet</div>
                     </div>
                 </div>
+
+                <button class="records-btn" id="recordsBtn">
+                    <i class="fas fa-history"></i> View Game Records
+                </button>
             </div>
 
             <div class="panel">
@@ -1016,24 +1218,6 @@
                     <div id="aiText">Waiting for evaluation...</div>
                 </div>
             </div>
-        </div>
-
-        <!-- Game Records moved to bottom of page -->
-        <div class="records-container">
-            <h3 class="records-title"><i class="fas fa-history"></i> Game Records</h3>
-            <table class="records-table" id="recordsTable">
-                <thead>
-                    <tr>
-                        <th>Word Length</th>
-                        <th>You Arranged</th>
-                        <th>Date</th>
-                        <th>Winning</th>
-                    </tr>
-                </thead>
-                <tbody id="recordsBody">
-                    <!-- Records will be populated here -->
-                </tbody>
-            </table>
         </div>
 
         <footer>
@@ -1077,6 +1261,52 @@
         </div>
     </div>
 
+    <!-- Records Modal -->
+    <div class="records-modal" id="recordsModal">
+        <div class="records-modal-content">
+            <div class="records-modal-header">
+                <h2 class="records-modal-title">
+                    <i class="fas fa-trophy"></i> Game Records
+                </h2>
+                <button class="records-modal-close" id="recordsModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="records-stats">
+                <div class="record-stat">
+                    <div class="record-stat-value" id="totalGames">0</div>
+                    <div class="record-stat-label">Total Games</div>
+                </div>
+                <div class="record-stat">
+                    <div class="record-stat-value" id="gamesWon">0</div>
+                    <div class="record-stat-label">Games Won</div>
+                </div>
+                <div class="record-stat">
+                    <div class="record-stat-value" id="winRate">0%</div>
+                    <div class="record-stat-label">Win Rate</div>
+                </div>
+            </div>
+
+            <div class="records-table-container">
+                <table class="records-table-modal" id="recordsTableModal">
+                    <thead>
+                        <tr>
+                            <th>Word Length</th>
+                            <th>You Arranged</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Winning</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsBodyModal">
+                        <!-- Records will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Game state
         let selectedNumbers = [];
@@ -1110,7 +1340,13 @@
         const helpOverlay = document.getElementById('helpOverlay');
         const helpClose = document.getElementById('helpClose');
         const correctionsBtn = document.getElementById('correctionsBtn');
-        const recordsBody = document.getElementById('recordsBody');
+        const recordsBtn = document.getElementById('recordsBtn');
+        const recordsModal = document.getElementById('recordsModal');
+        const recordsModalClose = document.getElementById('recordsModalClose');
+        const recordsBodyModal = document.getElementById('recordsBodyModal');
+        const totalGames = document.getElementById('totalGames');
+        const gamesWon = document.getElementById('gamesWon');
+        const winRate = document.getElementById('winRate');
 
         // Google AI Studio API key
         const GOOGLE_AI_API_KEY = "AIzaSyC5GqryX1qgFzT-iAJMdsajqiNPAAhm70o";
@@ -1140,6 +1376,15 @@
             helpBtn.addEventListener('click', showHelp);
             helpClose.addEventListener('click', hideHelp);
             correctionsBtn.addEventListener('click', showCorrections);
+            recordsBtn.addEventListener('click', showRecordsModal);
+            recordsModalClose.addEventListener('click', hideRecordsModal);
+            
+            // Close modal when clicking outside
+            recordsModal.addEventListener('click', (e) => {
+                if (e.target === recordsModal) {
+                    hideRecordsModal();
+                }
+            });
             
             // Word button event listeners
             wordButtons.forEach(button => {
@@ -1525,7 +1770,7 @@ PERSON2: [I WILL STAY FOR TWO WEEKS] [I NEED TO FIND A HOTEL FIRST]`;
                     updateUI();
                     
                     // Add record
-                    addGameRecord(selectedWordCount, sentence, winnings);
+                    addGameRecord(selectedWordCount, sentence, winnings, true);
                     
                     // Show AI evaluation
                     showAIEvaluation(sentence, true, winnings);
@@ -1534,7 +1779,7 @@ PERSON2: [I WILL STAY FOR TWO WEEKS] [I NEED TO FIND A HOTEL FIRST]`;
                     endRound(true, `Congratulations! You won ${winnings} coins!`);
                 } else {
                     // Add record with loss
-                    addGameRecord(selectedWordCount, sentence, 0);
+                    addGameRecord(selectedWordCount, sentence, 0, false);
                     
                     showAIEvaluation(sentence, false, 0);
                     // End the round with loss
@@ -1557,14 +1802,14 @@ PERSON2: [I WILL STAY FOR TWO WEEKS] [I NEED TO FIND A HOTEL FIRST]`;
                     updateUI();
                     
                     // Add record
-                    addGameRecord(selectedWordCount, sentence, winnings);
+                    addGameRecord(selectedWordCount, sentence, winnings, true);
                     
                     showAIEvaluation(sentence, true, winnings);
                     // End the round with win
                     endRound(true, `Congratulations! You won ${winnings} coins!`);
                 } else {
                     // Add record with loss
-                    addGameRecord(selectedWordCount, sentence, 0);
+                    addGameRecord(selectedWordCount, sentence, 0, false);
                     
                     showAIEvaluation(sentence, false, 0);
                     // End the round with loss
@@ -1632,7 +1877,7 @@ PERSON2: [I WILL STAY FOR TWO WEEKS] [I NEED TO FIND A HOTEL FIRST]`;
         }
 
         // Add game record
-        function addGameRecord(wordLength, arranged, winning) {
+        function addGameRecord(wordLength, arranged, winning, isWin) {
             const now = new Date();
             const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
             
@@ -1640,6 +1885,7 @@ PERSON2: [I WILL STAY FOR TWO WEEKS] [I NEED TO FIND A HOTEL FIRST]`;
                 wordLength: `W${wordLength}`,
                 arranged: arranged,
                 date: dateStr,
+                status: isWin ? "Won" : "Lost",
                 winning: winning
             };
             
@@ -1650,13 +1896,23 @@ PERSON2: [I WILL STAY FOR TWO WEEKS] [I NEED TO FIND A HOTEL FIRST]`;
                 gameRecords = gameRecords.slice(0, 10);
             }
             
-            updateRecordsTable();
+            updateRecordsModal();
         }
 
-        // Update records table
-        function updateRecordsTable() {
-            recordsBody.innerHTML = '';
+        // Update records modal
+        function updateRecordsModal() {
+            recordsBodyModal.innerHTML = '';
             
+            // Update stats
+            const total = gameRecords.length;
+            const won = gameRecords.filter(record => record.status === "Won").length;
+            const rate = total > 0 ? Math.round((won / total) * 100) : 0;
+            
+            totalGames.textContent = total;
+            gamesWon.textContent = won;
+            winRate.textContent = `${rate}%`;
+            
+            // Populate table
             gameRecords.forEach(record => {
                 const row = document.createElement('tr');
                 
@@ -1669,6 +1925,9 @@ PERSON2: [I WILL STAY FOR TWO WEEKS] [I NEED TO FIND A HOTEL FIRST]`;
                 const dateCell = document.createElement('td');
                 dateCell.textContent = record.date;
                 
+                const statusCell = document.createElement('td');
+                statusCell.innerHTML = `<span class="status ${record.status.toLowerCase()}">${record.status}</span>`;
+                
                 const winningCell = document.createElement('td');
                 winningCell.textContent = record.winning > 0 ? `+${record.winning}` : record.winning;
                 winningCell.className = record.winning > 0 ? 'win-amount' : 'loss-amount';
@@ -1676,9 +1935,10 @@ PERSON2: [I WILL STAY FOR TWO WEEKS] [I NEED TO FIND A HOTEL FIRST]`;
                 row.appendChild(wordLengthCell);
                 row.appendChild(arrangedCell);
                 row.appendChild(dateCell);
+                row.appendChild(statusCell);
                 row.appendChild(winningCell);
                 
-                recordsBody.appendChild(row);
+                recordsBodyModal.appendChild(row);
             });
         }
 
@@ -1707,6 +1967,17 @@ PERSON2: [I WILL STAY FOR TWO WEEKS] [I NEED TO FIND A HOTEL FIRST]`;
             // In a real implementation, this would show suggestions for improving the sentence
             // For now, we'll just show a notification
             showNotification('Corrections feature would suggest improvements to your sentence structure', 'info');
+        }
+
+        // Show records modal
+        function showRecordsModal() {
+            updateRecordsModal();
+            recordsModal.classList.add('active');
+        }
+
+        // Hide records modal
+        function hideRecordsModal() {
+            recordsModal.classList.remove('active');
         }
 
         // Update UI
