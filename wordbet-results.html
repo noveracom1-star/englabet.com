@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>WordBet Results</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+  <style>
+    :root {
+      --primary: #006aa6;
+      --primary-dark: #003f63;
+      --panel: #012a3f;
+      --mint: #a8e6cf;
+      --mint-2: #6ed3cf;
+      --ink: #032538;
+      --good: #19c37d;
+      --bad: #f25f5c;
+      --chip: #0a3a53;
+      --text: #e8fbff;
+      --text-secondary: #a8d0e6;
+      --glow: 0 20px 50px rgba(0,0,0,.35);
+      --ring: #bfeee0;
+      --receipt-bg: #f8fafc;
+      --receipt-border: #e2e8f0;
+      --receipt-text: #1e293b;
+      --receipt-accent: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial;
+      color: var(--text);
+      background: 
+        radial-gradient(1200px 700px at 15% -10%, #0287cc 0%, #015f91 35%, #003a58 100%),
+        linear-gradient(135deg, var(--primary), var(--primary-dark));
+      background-attachment: fixed;
+      padding: 16px;
+      overflow-x: hidden;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* animated ocean gradient sheen */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      background: conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,.06), rgba(255,255,255,0) 35%, rgba(255,255,255,.07) 55%, rgba(255,255,255,0) 85%);
+      filter: blur(60px);
+      animation: drift 26s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+      opacity: .5;
+    }
+
+    @keyframes drift {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* floating bubbles */
+    .bubbles {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -120px;
+      border-radius: 999px;
+      opacity: .15;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.2) 40%, rgba(255,255,255,0) 65%);
+      filter: blur(0.2px);
+      animation: rise var(--dur) linear infinite, sway calc(var(--dur)*.6) ease-in-out infinite;
+    }
+
+    @keyframes rise {
+      to {
+        transform: translateY(-115vh) translateZ(0);
+      }
+    }
+
+    @keyframes sway {
+      50% {
+        transform: translateX(18px);
+      }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 24px 0;
+      margin-bottom: 16px;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--mint), #d7f7e9);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Navigation */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,33,51,.55);
+      border: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(6px);
+      padding: 12px 16px;
+      border-radius: 12px;
+      box-shadow: var(--glow);
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      letter-spacing: .4px;
+    }
+
+    .logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--mint), var(--mint-2));
+      color: var(--ink);
+      font-weight: 900;
+      box-shadow: 0 6px 18px rgba(0,0,0,.25);
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--ink);
+      background: linear-gradient(90deg, var(--mint), var(--mint-2));
+      box-shadow: 0 8px 20px rgba(0,0,0,.22);
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+      font-size: 0.9rem;
+      min-height: 40px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(0,0,0,.30);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: #e5f9ff;
+      border: 1px solid rgba(168,230,207,.35);
+    }
+
+    /* Results Grid */
+    .results-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--mint);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    /* Receipt Card */
+    .receipt-card {
+      background: var(--receipt-bg);
+      border-radius: 12px;
+      border: 1px solid var(--receipt-border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      color: var(--receipt-text);
+    }
+
+    .receipt-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .receipt-header {
+      background: var(--receipt-accent);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .receipt-title {
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .receipt-date {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .receipt-body {
+      padding: 16px;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .receipt-label {
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    .receipt-value {
+      font-weight: 700;
+    }
+
+    .receipt-words {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .word-tag {
+      padding: 4px 8px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid #e2e8f0;
+    }
+
+    .word-tag.valid {
+      background: rgba(25,195,125,0.1);
+      border-color: rgba(25,195,125,0.3);
+      color: #065f46;
+    }
+
+    .word-tag.invalid {
+      background: rgba(242,95,92,0.1);
+      border-color: rgba(242,95,92,0.3);
+      color: #7f1d1d;
+    }
+
+    .receipt-footer {
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-top: 1px dashed #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .result-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+
+    .result-badge.win {
+      background: rgba(25,195,125,0.15);
+      color: #065f46;
+      border: 1px solid rgba(25,195,125,0.3);
+    }
+
+    .result-badge.lose {
+      background: rgba(242,95,92,0.15);
+      color: #7f1d1d;
+      border: 1px solid rgba(242,95,92,0.3);
+    }
+
+    .receipt-amount {
+      font-weight: 900;
+      font-size: 1.1rem;
+    }
+
+    .receipt-amount.positive {
+      color: var(--good);
+    }
+
+    .receipt-amount.negative {
+      color: var(--bad);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      color: var(--receipt-text);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--receipt-accent);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #64748b;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .modal-close:hover {
+      background: #f1f5f9;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-section {
+      margin-bottom: 20px;
+    }
+
+    .modal-section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--receipt-accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-letters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .letter-chip {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: linear-gradient(145deg, rgba(168,230,207,.25), rgba(168,230,207,.12));
+      border: 1px solid rgba(168,230,207,.4);
+      font-weight: 900;
+      font-size: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .modal-words {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+    }
+
+    .modal-word {
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    .modal-word.valid {
+      background: rgba(25,195,125,0.1);
+      border-color: rgba(25,195,125,0.3);
+      color: #065f46;
+    }
+
+    .modal-word.invalid {
+      background: rgba(242,95,92,0.1);
+      border-color: rgba(242,95,92,0.3);
+      color: #7f1d1d;
+    }
+
+    .modal-footer {
+      padding: 20px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Loading states */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255,255,255,0.1);
+      border-left: 4px solid var(--mint);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      opacity: 0.7;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 20px;
+      transform: translateX(-50%);
+      background: #fff;
+      color: #00324d;
+      border-radius: 10px;
+      padding: 12px 16px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.30);
+      z-index: 3000;
+      display: none;
+      max-width: 90%;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .toast.show {
+      display: block;
+      animation: drop .24s ease-out;
+    }
+
+    @keyframes drop {
+      from {
+        transform: translate(-50%, -14px);
+        opacity: 0;
+      }
+      to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+      }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2.2rem;
+      }
+      
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      
+      .nav-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+      }
+      
+      .page-title {
+        font-size: 1.8rem;
+      }
+      
+      .modal-content {
+        max-height: 85vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- bubbles -->
+  <div class="bubbles" aria-hidden="true" id="bubbles"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="page-title">WordBet Results</h1>
+      <p class="page-subtitle">Your betting history and performance</p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" style="background: transparent; box-shadow: none;">
+          <img src="englabet.png" alt="Englabet Logo" style="width: 32px; height: 32px; border-radius: 8px;">
+        </div>
+        <div>
+          <div style="font-size:0.9rem">WordBet Results</div>
+          <small style="opacity:.8;font-weight:700; font-size: 0.7rem;">Professional Dashboard</small>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button id="refresh-btn" class="btn secondary">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+        <button id="back-btn" class="btn">
+          <i class="fas fa-arrow-left"></i> Back to Game
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Container -->
+    <div class="results-container">
+      <div class="results-header">
+        <h2 class="section-title">Recent Betting Rounds</h2>
+        <div style="font-size: 0.9rem; opacity: 0.8; font-weight: 600;">
+          Showing <span id="results-count">0</span> results
+        </div>
+      </div>
+
+      <!-- Results Grid -->
+      <div id="results-grid" class="results-grid">
+        <!-- Results will be populated here -->
+        <div class="loading">
+          <div class="spinner"></div>
+          <div>Loading your results...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="result-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Round Details</h3>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <h4 class="modal-section-title">
+            <i class="fas fa-scroll"></i> Word Bag
+          </h4>
+          <div id="modal-letters" class="modal-letters">
+            <!-- Letters will be populated here -->
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <h4 class="modal-section-title">
+            <i class="fas fa-font"></i> Words Played
+          </h4>
+          <div id="modal-words" class="modal-words">
+            <!-- Words will be populated here -->
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <h4 class="modal-section-title">
+            <i class="fas fa-chart-bar"></i> Round Summary
+          </h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 4px;">Bet Amount</div>
+              <div id="modal-bet-amount" style="font-weight: 800; font-size: 1.1rem;">₦0</div>
+            </div>
+            <div>
+              <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 4px;">Words Count</div>
+              <div id="modal-words-count" style="font-weight: 800; font-size: 1.1rem;">0</div>
+            </div>
+            <div>
+              <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 4px;">Valid Words</div>
+              <div id="modal-valid-count" style="font-weight: 800; font-size: 1.1rem;">0</div>
+            </div>
+            <div>
+              <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 4px;">Invalid Words</div>
+              <div id="modal-invalid-count" style="font-weight: 800; font-size: 1.1rem;">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" id="modal-share">
+          <i class="fas fa-share"></i> Share
+        </button>
+        <button class="btn" id="modal-close-btn">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="assertive"></div>
+
+  <script>
+    (() => {
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDivFTAKUznc1xryU8marfMDZG3v1eYsl8",
+        authDomain: "englabet-ad1fe.firebaseapp.com",
+        projectId: "englabet-ad1fe",
+        storageBucket: "englabet-ad1fe.firebasestorage.app",
+        messagingSenderId: "124544822433",
+        appId: "1:124544822433:web:c77c980f28c99364c214e0",
+        measurementId: "G-JMYYM433R7"
+      };
+      
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+
+      // State
+      let currentUser = null;
+      let betHistory = [];
+      let selectedResult = null;
+
+      // DOM Elements
+      const els = {
+        resultsGrid: document.getElementById('results-grid'),
+        resultsCount: document.getElementById('results-count'),
+        refreshBtn: document.getElementById('refresh-btn'),
+        backBtn: document.getElementById('back-btn'),
+        toast: document.getElementById('toast'),
+        modal: document.getElementById('result-modal'),
+        modalClose: document.getElementById('modal-close'),
+        modalCloseBtn: document.getElementById('modal-close-btn'),
+        modalLetters: document.getElementById('modal-letters'),
+        modalWords: document.getElementById('modal-words'),
+        modalBetAmount: document.getElementById('modal-bet-amount'),
+        modalWordsCount: document.getElementById('modal-words-count'),
+        modalValidCount: document.getElementById('modal-valid-count'),
+        modalInvalidCount: document.getElementById('modal-invalid-count'),
+        modalShare: document.getElementById('modal-share')
+      };
+
+      // Utility Functions
+      const formatMoney = (n) => '₦' + n.toLocaleString();
+      const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      };
+
+      function notify(msg, type = "info") {
+        els.toast.textContent = msg;
+        els.toast.style.color = type === "error" ? "#6a0000" : "#00324d";
+        els.toast.classList.add('show');
+        setTimeout(() => els.toast.classList.remove('show'), 3000);
+      }
+
+      // Bubble animation
+      function spawnBubbles() {
+        const bubbles = document.getElementById('bubbles');
+        const n = 12;
+        for(let i = 0; i < n; i++) {
+          const b = document.createElement('div');
+          b.className = 'bubble';
+          const size = 8 + Math.random() * 20;
+          b.style.width = size + 'px';
+          b.style.height = size + 'px';
+          b.style.left = (Math.random() * 100) + '%';
+          b.style.setProperty('--dur', (15 + Math.random() * 15) + 's');
+          b.style.animationDelay = (-Math.random() * 15) + 's';
+          bubbles.appendChild(b);
+        }
+      }
+
+      // Firebase Data Fetching
+      async function fetchBetHistory(limit = 20) {
+        if (!currentUser) return [];
+        
+        try {
+          const snapshot = await db.collection('users').doc(currentUser.uid)
+            .collection('bet_history')
+            .orderBy('timestamp', 'desc')
+            .limit(limit)
+            .get();
+          
+          const history = [];
+          snapshot.forEach(doc => {
+            history.push({ id: doc.id, ...doc.data() });
+          });
+          
+          return history;
+        } catch (error) {
+          console.error("Error fetching bet history:", error);
+          notify("Failed to load bet history", "error");
+          return [];
+        }
+      }
+
+      // UI Rendering
+      function renderResults(history) {
+        if (history.length === 0) {
+          els.resultsGrid.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <div>No betting history found</div>
+              <div style="font-size:0.9rem;margin-top:10px;">Play a game to see results here!</div>
+            </div>
+          `;
+          els.resultsCount.textContent = '0';
+          return;
+        }
+
+        els.resultsCount.textContent = history.length;
+        els.resultsGrid.innerHTML = '';
+
+        history.forEach(result => {
+          const isWin = result.result >= 0;
+          const words = result.words || [];
+          const validWords = result.validWords || [];
+          
+          // Create receipt card
+          const card = document.createElement('div');
+          card.className = 'receipt-card';
+          card.addEventListener('click', () => openModal(result));
+          
+          // Calculate counts
+          const validCount = words.filter(word => validWords.includes(word)).length;
+          const invalidCount = words.length - validCount;
+          
+          card.innerHTML = `
+            <div class="receipt-header">
+              <div class="receipt-title">WordBet Round</div>
+              <div class="receipt-date">${formatDate(result.date)}</div>
+            </div>
+            <div class="receipt-body">
+              <div class="receipt-row">
+                <span class="receipt-label">Bet Amount:</span>
+                <span class="receipt-value">${formatMoney(result.betAmount || 0)}</span>
+              </div>
+              <div class="receipt-row">
+                <span class="receipt-label">Words Played:</span>
+                <span class="receipt-value">${words.length}</span>
+              </div>
+              <div class="receipt-row">
+                <span class="receipt-label">Valid Words:</span>
+                <span class="receipt-value">${validCount}</span>
+              </div>
+              <div class="receipt-words">
+                ${words.slice(0, 4).map(word => {
+                  const isValid = validWords.includes(word);
+                  return `<span class="word-tag ${isValid ? 'valid' : 'invalid'}">${word.toUpperCase()}</span>`;
+                }).join('')}
+                ${words.length > 4 ? `<span class="word-tag">+${words.length - 4} more</span>` : ''}
+              </div>
+            </div>
+            <div class="receipt-footer">
+              <div class="result-badge ${isWin ? 'win' : 'lose'}">
+                ${isWin ? 'WIN' : 'LOSE'}
+              </div>
+              <div class="receipt-amount ${isWin ? 'positive' : 'negative'}">
+                ${isWin ? '+' : ''}${formatMoney(result.result)}
+              </div>
+            </div>
+          `;
+          
+          els.resultsGrid.appendChild(card);
+        });
+      }
+
+      // Modal Functions
+      function openModal(result) {
+        selectedResult = result;
+        
+        const words = result.words || [];
+        const validWords = result.validWords || [];
+        const wordBag = result.wordBag || [];
+        
+        // Update modal content
+        els.modalLetters.innerHTML = '';
+        wordBag.forEach(letter => {
+          const chip = document.createElement('div');
+          chip.className = 'letter-chip';
+          chip.textContent = letter.toUpperCase();
+          els.modalLetters.appendChild(chip);
+        });
+        
+        els.modalWords.innerHTML = '';
+        words.forEach(word => {
+          const wordEl = document.createElement('div');
+          const isValid = validWords.includes(word);
+          wordEl.className = `modal-word ${isValid ? 'valid' : 'invalid'}`;
+          wordEl.textContent = word.toUpperCase();
+          els.modalWords.appendChild(wordEl);
+        });
+        
+        els.modalBetAmount.textContent = formatMoney(result.betAmount || 0);
+        els.modalWordsCount.textContent = words.length;
+        els.modalValidCount.textContent = words.filter(word => validWords.includes(word)).length;
+        els.modalInvalidCount.textContent = words.length - words.filter(word => validWords.includes(word)).length;
+        
+        // Show modal
+        els.modal.classList.add('active');
+      }
+
+      function closeModal() {
+        els.modal.classList.remove('active');
+        selectedResult = null;
+      }
+
+      // Data Loading
+      async function loadData() {
+        notify("Loading your results...");
+        
+        try {
+          betHistory = await fetchBetHistory();
+          renderResults(betHistory);
+          notify("Results loaded successfully!");
+        } catch (error) {
+          console.error("Error loading data:", error);
+          notify("Failed to load results", "error");
+        }
+      }
+
+      // Event Handlers
+      function setupEventListeners() {
+        els.refreshBtn.addEventListener('click', loadData);
+        
+        els.backBtn.addEventListener('click', () => {
+          window.location.href = 'dewdrop.html';
+        });
+        
+        els.modalClose.addEventListener('click', closeModal);
+        els.modalCloseBtn.addEventListener('click', closeModal);
+        
+        // Close modal when clicking outside
+        els.modal.addEventListener('click', (e) => {
+          if (e.target === els.modal) {
+            closeModal();
+          }
+        });
+        
+        // Share functionality
+        els.modalShare.addEventListener('click', () => {
+          if (!selectedResult) return;
+          
+          const isWin = selectedResult.result >= 0;
+          const shareText = `I just ${isWin ? 'won' : 'lost'} ${formatMoney(selectedResult.result)} in WordBet! 
+Words Played: ${selectedResult.words.length}
+Valid Words: ${selectedResult.words.filter(word => selectedResult.validWords.includes(word)).length}
+Bet Amount: ${formatMoney(selectedResult.betAmount)}
+          
+Can you beat my score?`;
+          
+          if (navigator.share) {
+            navigator.share({
+              title: 'My WordBet Result',
+              text: shareText,
+              url: window.location.href
+            });
+          } else {
+            navigator.clipboard.writeText(shareText).then(() => {
+              notify("Result copied to clipboard!");
+            });
+          }
+        });
+      }
+
+      // Authentication
+      function checkAuthState() {
+        auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            currentUser = user;
+            await loadData();
+          } else {
+            // Redirect to login if not authenticated
+            window.location.href = 'login.html';
+          }
+        });
+      }
+
+      // Initialize
+      async function init() {
+        spawnBubbles();
+        setupEventListeners();
+        checkAuthState();
+      }
+
+      // Start the application
+      init();
+    })();
+  </script>
+</body>
+</html>

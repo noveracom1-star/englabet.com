@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnglaBet - Word Gaming Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        :root {
+            --primary: #0a2e5a;
+            --secondary: #1a4789;
+            --accent: #1e90ff;
+            --accent-gradient: linear-gradient(to right, #1e90ff, #00bfff);
+            --text-light: #ffffff;
+            --text-gray: #a0c1ed;
+            --card-bg: #1a3e75;
+            --card-dark: #0f2b50;
+        }
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding-bottom: 20px;
+        }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        /* Header Styles */
+        header {
+            background: linear-gradient(to right, #0d3b78, var(--primary));
+            padding: 15px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        .logo-img {
+            width: 150px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .logo-img img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .btn-login {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+        .btn-login:hover {
+            background: rgba(30, 144, 255, 0.1);
+        }
+        .btn-register {
+            background: var(--accent-gradient);
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(30, 144, 255, 0.4);
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 144, 255, 0.6);
+        }
+        /* Sports Navigation */
+        .sports-nav {
+            display: flex;
+            overflow-x: auto;
+            padding: 15px 0;
+            gap: 20px;
+            border-bottom: 1px solid #1e4a86;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            justify-content: center;
+        }
+        .sports-nav::-webkit-scrollbar {
+            display: none;
+        }
+        .sport-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .sport-item:hover {
+            transform: translateY(-3px);
+        }
+        .sport-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        .sport-active .sport-icon {
+            background: var(--accent-gradient);
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(30, 144, 255, 0.4);
+        }
+        .sport-name {
+            font-size: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+        /* Game Types */
+        .game-types {
+            display: flex;
+            overflow-x: auto;
+            padding: 15px 0;
+            gap: 15px;
+            border-bottom: 1px solid #1e4a86;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .game-types::-webkit-scrollbar {
+            display: none;
+        }
+        .game-type {
+            padding: 8px 15px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .game-type:hover {
+            transform: translateY(-2px);
+        }
+        .game-type-active {
+            background: var(--accent-gradient);
+            color: var(--primary);
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(30, 144, 255, 0.4);
+        }
+        /* Promotional Banner */
+        .promo-banner {
+            background: var(--accent-gradient);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            color: var(--primary);
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(30, 144, 255, 0.4);
+            animation: pulse 2s infinite;
+        }
+        .promo-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .promo-text {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .promo-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .promo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        /* Quick Access Menu */
+        .quick-access {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .quick-item {
+            background: var(--card-bg);
+            padding: 15px 10px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .quick-item:hover {
+            transform: translateY(-3px);
+            background: var(--accent-gradient);
+            color: var(--primary);
+        }
+        .quick-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .quick-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        /* Scroll to Top Button */
+        .scroll-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 99;
+            transition: all 0.3s ease;
+            display: none;
+        }
+        .scroll-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        /* Empty Screen Styles */
+        .empty-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        .empty-icon {
+            font-size: 60px;
+            color: var(--text-gray);
+            margin-bottom: 20px;
+        }
+        .empty-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-light);
+        }
+        .empty-text {
+            font-size: 16px;
+            color: var(--text-gray);
+            margin-bottom: 30px;
+        }
+        .empty-btn {
+            background: var(--accent-gradient);
+            color: var(--primary);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(30, 144, 255, 0.4);
+        }
+        .empty-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(30, 144, 255, 0.6);
+        }
+        /* Footer Styles */
+        .footer {
+            background: var(--card-dark);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0 20px;
+            text-align: center;
+        }
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .footer-link {
+            color: var(--text-gray);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px;
+        }
+        .footer-link:hover {
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .footer-text {
+            color: var(--text-gray);
+            font-size: 10px;
+            margin-top: 15px;
+            line-height: 1.4;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-img">
+                    <!-- Custom logo image -->
+                    <img src="englabet.png" alt="EnglaBet Logo">
+                </div>
+            </div>
+            <div class="auth-buttons">
+                <button class="btn btn-login" id="loginBtn">Login</button>
+                <button class="btn btn-register" id="registerBtn">Register</button>
+            </div>
+        </header>
+        <div class="sports-nav">
+            <div class="sport-item sport-active" data-screen="home">
+                <div class="sport-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div class="sport-name">Home</div>
+            </div>
+            <div class="sport-item" data-screen="wordbet">
+                <div class="sport-icon">
+                    <i class="fas fa-font"></i>
+                </div>
+                <div class="sport-name">WordBet</div>
+            </div>
+            <div class="sport-item" data-screen="spelling">
+                <div class="sport-icon">
+                    <i class="fas fa-spell-check"></i>
+                </div>
+                <div class="sport-name">Spelling</div>
+            </div>
+            <div class="sport-item" data-screen="syntaxbet">
+                <div class="sport-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="sport-name">SyntaxBet</div>
+            </div>
+        </div>
+        <div class="game-types">
+            <div class="game-type game-type-active">All Games</div>
+            <div class="game-type">Live</div>
+            <div class="game-type">DEWDROP</div>
+            <div class="game-type">AWL FAST LANE</div>
+            <div class="game-type">MIDDAY EXIT</div>
+            <div class="game-type">Upcoming</div>
+            <div class="game-type">Popular</div>
+        </div>
+        <!-- Home Screen Content -->
+        <div id="home-screen" class="screen-content">
+            <!-- Promotional Banner -->
+            <div class="promo-banner">
+                <div class="promo-title">Welcome Bonus!</div>
+                <div class="promo-text">Get 200% bonus on your first deposit</div>
+                <button class="promo-btn" onclick="window.location.href='login.html'">Claim Now</button>
+            </div>
+            <!-- Quick Access Menu -->
+            <div class="quick-access">
+                <div class="quick-item" onclick="window.location.href='login.html'">
+                    <div class="quick-icon"><i class="fas fa-coins"></i></div>
+                    <div class="quick-text">Deposit</div>
+                </div>
+                <div class="quick-item" onclick="window.location.href='login.html'">
+                    <div class="quick-icon"><i class="fas fa-wallet"></i></div>
+                    <div class="quick-text">Withdraw</div>
+                </div>
+                <div class="quick-item" onclick="window.location.href='login.html'">
+                    <div class="quick-icon"><i class="fas fa-gift"></i></div>
+                    <div class="quick-text">Promotions</div>
+                </div>
+                <div class="quick-item" onclick="window.location.href='login.html'">
+                    <div class="quick-icon"><i class="fas fa-history"></i></div>
+                    <div class="quick-text">History</div>
+                </div>
+            </div>
+            
+            <!-- Footer Section -->
+            <div class="footer">
+                <div class="footer-links">
+                    <div class="footer-link" onclick="navigateTo('terms')">Terms & Conditions</div>
+                    <div class="footer-link" onclick="navigateTo('privacy')">Privacy Policy</div>
+                    <div class="footer-link" onclick="navigateTo('help')">Help</div>
+                    <div class="footer-link" onclick="navigateTo('contact')">Contact Us</div>
+                    <div class="footer-link" onclick="navigateTo('support')">Customer Support</div>
+                    <div class="footer-link" onclick="navigateTo('faq')">FAQ</div>
+                </div>
+                <div class="footer-text">
+                    EnglaBet is a word gaming platform for entertainment purposes only. Please play responsibly. 
+                    Users must be 18 years or older to participate. © 2026 EnglaBet. All rights reserved.
+                </div>
+            </div>
+        </div>
+        <!-- Empty Screens for Navigation Items -->
+        <div id="wordbet-screen" class="empty-screen">
+            <div class="empty-icon"><i class="fas fa-font"></i></div>
+            <div class="empty-title">WordBet</div>
+            <div class="empty-text"></div>
+            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+        <div id="spelling-screen" class="empty-screen">
+            <div class="empty-icon"><i class="fas fa-spell-check"></i></div>
+            <div class="empty-title">Spelling Games</div>
+            <div class="empty-text"></div>
+            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+        <div id="syntaxbet-screen" class="empty-screen">
+            <div class="empty-icon"><i class="fas fa-code"></i></div>
+            <div class="empty-title">SyntaxBet</div>
+            <div class="empty-text"></div>
+            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+        <div id="me-screen" class="empty-screen">
+            <div class="empty-icon"><i class="fas fa-user"></i></div>
+            <div class="empty-title">My Account</div>
+            <div class="empty-text"></div>
+            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+        <!-- Footer Screens -->
+        <div id="terms-screen" class="empty-screen">
+            <div class="empty-icon"><i class="fas fa-file-contract"></i></div>
+            <div class="empty-title">Terms & Conditions</div>
+            <div class="empty-text">Our terms and conditions are currently being updated.</div>
+            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+        <div id="privacy-screen" class="empty-screen">
+            <div class="empty-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="empty-title">Privacy Policy</div>
+            <div class="empty-text">Our privacy policy is currently being updated.</div>
+            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+        <div id="help-screen" class="empty-screen">
+            <div class="empty-icon"><i class="fas fa-question-circle"></i></div>
+            <div class="empty-title">Help</div>
+            <div class="empty-text">Help documentation is currently being prepared.</div>
+            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+        <div id="contact-screen" class="empty-screen">
+            <div class="empty-icon"><i class="fas fa-envelope"></i></div>
+            <div class="empty-title">Contact Us</div>
+            <div class="empty-text">Contact information will be available soon.</div>
+            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+        <div id="support-screen" class="empty-screen">
+            <div class="empty-icon"><i class="fas fa-headset"></i></div>
+            <div class="empty-title">Customer Support</div>
+            <div class="empty-text">Customer support details will be available soon.</div>
+            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+        <div id="faq-screen" class="empty-screen">
+            <div class="empty-icon"><i class="fas fa-comments"></i></div>
+            <div class="empty-title">Frequently Asked Questions</div>
+            <div class="empty-text">FAQ content is currently being prepared.</div>
+            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+    </div>
+    <!-- Scroll to Top Button -->
+    <div class="scroll-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Firebase Module Import (Updated) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+  apiKey: "AIzaSyDivFTAKUznc1xryU8marfMDZG3v1eYsl8",
+  authDomain: "englabet-ad1fe.firebaseapp.com",
+  projectId: "englabet-ad1fe",
+  storageBucket: "englabet-ad1fe.firebasestorage.app",
+  messagingSenderId: "124544822433",
+  appId: "1:124544822433:web:c77c980f28c99364c214e0",
+  measurementId: "G-JMYYM433R7"
+};
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Navigation functionality
+        function navigateTo(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen-content, .empty-screen').forEach(screen => {
+                screen.style.display = 'none';
+            });
+            // Show the selected screen
+            if (screenId === 'home') {
+                document.getElementById('home-screen').style.display = 'block';
+            } else {
+                document.getElementById(`${screenId}-screen`).style.display = 'block';
+            }
+            // Update active states
+            document.querySelectorAll('.sport-item').forEach(item => {
+                item.classList.remove('sport-active');
+            });
+            // Set active state for the clicked item
+            document.querySelectorAll(`[data-screen="${screenId}"]`).forEach(item => {
+                item.classList.add('sport-active');
+            });
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Set up navigation event listeners
+        document.querySelectorAll('.sport-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const screenId = this.getAttribute('data-screen');
+                navigateTo(screenId);
+            });
+        });
+
+        // Show/hide scroll to top button based on scroll position
+        window.addEventListener('scroll', function() {
+            const scrollTop = document.querySelector('.scroll-top');
+            if (window.pageYOffset > 300) {
+                scrollTop.style.display = 'flex';
+            } else {
+                scrollTop.style.display = 'none';
+            }
+        });
+
+        // Authentication button handlers
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            window.location.href = 'login.html';
+        });
+        document.getElementById('registerBtn').addEventListener('click', function() {
+            window.location.href = 'signup.html';
+        });
+
+        // Initialize the page with home screen
+        navigateTo('home');
+    </script>
+</body>
+</html>

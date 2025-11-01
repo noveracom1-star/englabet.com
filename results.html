@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Transaction History — Dewdrop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ocean-900: #003f63;
+    --ocean-700: #0072a8;
+    --ocean-500: #00a0ff;
+    --ocean-300: #7fd1ff;
+    --white: #ffffff;
+    --muted: #6b7280;
+    --glass: rgba(255,255,255,0.08);
+    --card-radius: 12px;
+    --shadow-lg: 0 10px 30px rgba(3,10,34,0.25);
+    --shadow-md: 0 6px 18px rgba(3,10,34,0.12);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+
+  html,body{
+    height:100%;
+    margin:0;
+    background: linear-gradient(180deg, #eaf8ff 0%, #f7fbff 100%);
+    color: #0b1220;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* Page container */
+  .page {
+    max-width:1100px;
+    margin:40px auto;
+    padding:28px;
+  }
+
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:20px;
+  }
+
+  .brand {
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .logo {
+    width:56px;
+    height:56px;
+    border-radius:14px;
+    background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow: var(--shadow-md);
+    color:var(--white);
+    font-weight:800;
+    font-size:18px;
+    letter-spacing:0.6px;
+    padding:6px;
+  }
+
+  h1 {
+    margin:0;
+    font-size:20px;
+    font-weight:700;
+    color:var(--ocean-900);
+  }
+
+  .sub {
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  /* Controls */
+  .controls {
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+
+  .search {
+    background:var(--white);
+    border-radius:999px;
+    padding:8px 12px;
+    box-shadow: var(--shadow-md);
+    display:flex;
+    gap:8px;
+    align-items:center;
+    min-width:220px;
+  }
+
+  .search input{
+    border:0;
+    outline:none;
+    font-size:14px;
+    width:160px;
+  }
+
+  .filter-btn{
+    background:transparent;
+    border:1px solid rgba(0,0,0,0.06);
+    padding:8px 12px;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:var(--shadow-md);
+  }
+
+  /* List container */
+  .list {
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    margin-top:16px;
+  }
+
+  /* Receipt row (horizontal) */
+  .receipt {
+    background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+    border-radius: var(--card-radius);
+    padding:16px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    cursor:pointer;
+    border-left:6px solid transparent;
+    transition:transform .22s ease, box-shadow .22s ease, border-left-color .22s;
+    box-shadow: var(--shadow-md);
+  }
+  .receipt:hover{
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .receipt .left {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:220px;
+  }
+
+  .game-badge {
+    width:56px;
+    height:56px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
+    color:var(--white);
+    font-weight:800;
+    box-shadow: 0 6px 18px rgba(0,112,168,0.25);
+    flex-shrink:0;
+  }
+
+  .meta {
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .meta .title {
+    font-weight:700;
+    color:var(--ocean-900);
+    letter-spacing:0.6px;
+  }
+  .meta .small {
+    font-size:13px;
+    color:var(--muted);
+  }
+
+  .middle {
+    flex:1;
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:center;
+  }
+
+  .tag {
+    font-size:13px;
+    padding:8px 10px;
+    border-radius:999px;
+    background: linear-gradient(90deg, rgba(0,160,255,0.07), rgba(0,112,168,0.04));
+    color:var(--ocean-700);
+    font-weight:600;
+    border:1px solid rgba(0,112,168,0.06);
+  }
+
+  .amount {
+    min-width:120px;
+    text-align:right;
+    font-weight:800;
+    font-size:18px;
+  }
+
+  .amount.plus{
+    color: #0a8f3c;
+  }
+  .amount.minus{
+    color: #d63d3d;
+  }
+
+  /* small note */
+  .note {
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+    margin-top:6px;
+  }
+
+  /* Modal (pop-out) */
+  .overlay {
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: rgba(3,10,34,0.45);
+    backdrop-filter: blur(4px);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .22s ease;
+    z-index:60;
+  }
+  .overlay.open{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  .modal {
+    width:min(920px, 94vw);
+    max-height:90vh;
+    overflow:auto;
+    border-radius:18px;
+    background: linear-gradient(180deg, var(--white), #fbfeff);
+    box-shadow: 0 20px 50px rgba(3,10,34,0.45);
+    transform: translateY(10px) scale(.99);
+    transition: transform .28s cubic-bezier(.2,.9,.3,1);
+    position:relative;
+    border:1px solid rgba(0,0,0,0.04);
+  }
+  .overlay.open .modal{
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, var(--ocean-700), var(--ocean-500));
+    padding:28px 28px 18px 28px;
+    border-top-left-radius:18px;
+    border-top-right-radius:18px;
+    color:var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+
+  .modal-header .center-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .modal-header .game-big {
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:1px;
+  }
+  .modal-header .sub-title {
+    font-size:13px;
+    opacity:0.95;
+    font-weight:600;
+  }
+
+  .close-btn {
+    position:absolute;
+    right:18px;
+    top:18px;
+    background:rgba(255,255,255,0.12);
+    border:none;
+    padding:8px;
+    border-radius:10px;
+    color:var(--white);
+    cursor:pointer;
+    font-weight:700;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  }
+
+  .modal-body {
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    gap:20px;
+    padding:22px;
+  }
+
+  /* left: big receipt details */
+  .receipt-card {
+    background: linear-gradient(180deg, rgba(0,112,168,0.03), rgba(127,209,255,0.02));
+    border-radius:12px;
+    padding:18px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  .receipt-card .top {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+
+  .receipt-card .top .left {
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .receipt-card .top .left .badge {
+    width:72px;
+    height:72px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
+    color:var(--white);
+    font-size:20px;
+  }
+
+  .receipt-grid {
+    margin-top:18px;
+    display:grid;
+    grid-template-columns: repeat(2,1fr);
+    gap:12px 18px;
+    color:var(--ocean-900);
+  }
+
+  .field {
+    background:var(--white);
+    border-radius:10px;
+    padding:12px;
+    border:1px solid rgba(0,0,0,0.04);
+    box-shadow: var(--shadow-md);
+  }
+  .field .label { font-size:11px; color:var(--muted); font-weight:700; }
+  .field .value { margin-top:6px; font-weight:800; font-size:15px; color:var(--ocean-900); }
+
+  .receipt-card .notes {
+    margin-top:14px;
+    font-size:13px;
+    color:var(--muted);
+  }
+
+  /* right column: side details like OPAY receipt style listing */
+  .side {
+    border-radius:12px;
+    padding:14px;
+    background:var(--white);
+    border:1px solid rgba(0,0,0,0.04);
+    box-shadow: var(--shadow-md);
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .side .row {
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    align-items:center;
+    padding:8px 6px;
+  }
+  .side .row .k {
+    color:var(--muted);
+    font-weight:700;
+    font-size:13px;
+  }
+  .side .row .v {
+    font-weight:800;
+    text-align:right;
+  }
+
+  .side .cta {
+    margin-top:auto;
+    display:flex;
+    gap:10px;
+  }
+
+  .btn {
+    flex:1;
+    border-radius:10px;
+    padding:12px 14px;
+    border:0;
+    font-weight:800;
+    cursor:pointer;
+  }
+
+  .btn.primary {
+    background: linear-gradient(90deg,var(--ocean-700), var(--ocean-500));
+    color:var(--white);
+    box-shadow: 0 10px 30px rgba(0,112,168,0.2);
+  }
+  .btn.ghost {
+    background:transparent;
+    border:1px solid rgba(0,0,0,0.06);
+    color:var(--ocean-900);
+  }
+
+  /* responsive */
+  @media (max-width:880px){
+    .modal-body { grid-template-columns: 1fr; }
+    .receipt-grid { grid-template-columns: 1fr; }
+    .list { gap:10px; }
+    .receipt { padding:14px; }
+    .left .game-badge { width:48px; height:48px; border-radius:10px; }
+    .logo { width:46px; height:46px; font-size:16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header>
+    <div class="brand">
+      <div class="logo">DD</div>
+      <div>
+        <h1>Dewdrop — Transaction History</h1>
+        <div class="sub">Recent game results & receipts</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="search" aria-hidden="false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="#0b1220" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#0b1220" stroke-width="2"/></svg>
+        <input id="search" placeholder="Search by name, game, ref..." />
+      </div>
+      <button class="filter-btn" id="filterAll">All</button>
+      <button class="filter-btn" id="filterWin">Rewards</button>
+      <button class="filter-btn" id="filterBet">Bet</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="list" id="list">
+      <!-- receipts inserted by JS -->
+    </div>
+  </main>
+</div>
+
+<!-- Modal overlay -->
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <button class="close-btn" id="closeBtn" title="Close">✕</button>
+      <div class="center-title">
+        <div class="game-big" id="modalGame">DEWDROP</div>
+        <div class="sub-title" id="modalSub">Transaction receipt</div>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="receipt-card">
+        <div class="top">
+          <div class="left">
+            <div class="badge" id="modalBadge">DD</div>
+            <div>
+              <div style="font-weight:800; font-size:16px" id="modalPlayer">Player — JOHN DOE</div>
+              <div style="color:var(--muted); font-size:13px; margin-top:6px" id="modalDate">May 1, 2025 — 12:34 PM</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:18px; font-weight:900" id="modalAmount">+50</div>
+            <div style="font-size:13px; color:var(--muted)">Balance: ₦1,234.00</div>
+          </div>
+        </div>
+
+        <div class="receipt-grid">
+          <div class="field">
+            <div class="label">GAME</div>
+            <div class="value" id="fGame">DEWDROP</div>
+          </div>
+          <div class="field">
+            <div class="label">PLAYER NAME</div>
+            <div class="value" id="fName">JOHN DOE</div>
+          </div>
+          <div class="field">
+            <div class="label">BET AMOUNT</div>
+            <div class="value" id="fBet">₦30</div>
+          </div>
+          <div class="field">
+            <div class="label">REWARD AMOUNT</div>
+            <div class="value" id="fReward">₦50</div>
+          </div>
+          <div class="field">
+            <div class="label">TRANSACTION TYPE</div>
+            <div class="value" id="fType">PAYOUT</div>
+          </div>
+          <div class="field">
+            <div class="label">REFERENCE</div>
+            <div class="value" id="fRef">TRX-20250501-0001</div>
+          </div>
+        </div>
+
+        <div class="notes">
+          <strong>Notes:</strong> This is a generated receipt. Always keep your transaction reference for future queries.
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="row"><div class="k">Status</div><div class="v" id="sStatus">Successful</div></div>
+        <div class="row"><div class="k">Date & Time</div><div class="v" id="sDate">—</div></div>
+        <div class="row"><div class="k">Game</div><div class="v" id="sGame">DEWDROP</div></div>
+        <div class="row"><div class="k">Player</div><div class="v" id="sPlayer">JOHN DOE</div></div>
+        <div class="row"><div class="k">Bet Amount</div><div class="v" id="sBet">₦0</div></div>
+        <div class="row"><div class="k">Reward</div><div class="v" id="sReward">₦0</div></div>
+        <div class="row"><div class="k">Balance After</div><div class="v" id="sBal">₦0</div></div>
+        <div class="row"><div class="k">Ref</div><div class="v" id="sRef">—</div></div>
+
+        <div class="cta">
+          <button class="btn ghost" id="printBtn">Print</button>
+          <button class="btn primary" id="downloadBtn">Download</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Sample data
+  const data = [
+    { id:'TRX-0001', game:'DEWDROP', player:'Alice Johnson', bet: 30, reward: 50, amount:+50, date:'2025-10-01 14:12', status:'Successful', balanceAfter: 1234.00 },
+    { id:'TRX-0002', game:'DEWDROP', player:'Bashir Bello', bet: 20, reward: 0, amount:-20, date:'2025-10-02 09:22', status:'Lost', balanceAfter: 1214.00 },
+    { id:'TRX-0003', game:'DEWDROP', player:'Chima Eze', bet: 50, reward: 100, amount:+50, date:'2025-10-03 19:01', status:'Payout', balanceAfter: 1314.00 },
+    { id:'TRX-0004', game:'DEWDROP', player:'Dana Lopez', bet: 10, reward: 0, amount:-10, date:'2025-10-04 11:45', status:'Lost', balanceAfter: 1304.00 },
+    { id:'TRX-0005', game:'DEWDROP', player:'Erin Smith', bet: 75, reward: 150, amount:+75, date:'2025-10-05 07:34', status:'Successful', balanceAfter: 1379.00 }
+  ];
+
+  const listEl = document.getElementById('list');
+  const overlay = document.getElementById('overlay');
+
+  function formatCurrency(n){
+    // simple formatting (Naira-like) with thousands separator
+    const nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return '₦' + nf.format(n);
+  }
+
+  function createRow(item){
+    const r = document.createElement('div');
+    r.className = 'receipt';
+    r.dataset.id = item.id;
+
+    // left
+    const left = document.createElement('div');
+    left.className = 'left';
+    const badge = document.createElement('div');
+    badge.className = 'game-badge';
+    badge.textContent = item.game.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = item.player.toUpperCase();
+    const small = document.createElement('div');
+    small.className = 'small';
+    small.textContent = item.game + ' • ' + item.date.split(' ')[0];
+
+    meta.appendChild(title);
+    meta.appendChild(small);
+    left.appendChild(badge);
+    left.appendChild(meta);
+
+    // middle
+    const middle = document.createElement('div');
+    middle.className = 'middle';
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.textContent = item.status;
+    const note = document.createElement('div');
+    note.className = 'note';
+    note.textContent = 'Ref: ' + item.id;
+
+    middle.appendChild(tag);
+    middle.appendChild(note);
+
+    // amount
+    const amount = document.createElement('div');
+    amount.className = 'amount ' + (item.amount >= 0 ? 'plus' : 'minus');
+    amount.textContent = (item.amount >= 0 ? '+' : '-') + Math.abs(item.amount);
+
+    r.appendChild(left);
+    r.appendChild(middle);
+    r.appendChild(amount);
+
+    r.addEventListener('click', () => openModal(item));
+    return r;
+  }
+
+  // initial render
+  function renderList(items){
+    listEl.innerHTML = '';
+    for(const it of items){
+      listEl.appendChild(createRow(it));
+    }
+  }
+
+  renderList(data);
+
+  // Modal population & open/close
+  const modalGame = document.getElementById('modalGame');
+  const modalSub  = document.getElementById('modalSub');
+  const modalBadge = document.getElementById('modalBadge');
+  const modalPlayer = document.getElementById('modalPlayer');
+  const modalDate = document.getElementById('modalDate');
+  const modalAmount = document.getElementById('modalAmount');
+
+  const fGame = document.getElementById('fGame');
+  const fName = document.getElementById('fName');
+  const fBet = document.getElementById('fBet');
+  const fReward = document.getElementById('fReward');
+  const fType = document.getElementById('fType');
+  const fRef = document.getElementById('fRef');
+
+  const sStatus = document.getElementById('sStatus');
+  const sDate = document.getElementById('sDate');
+  const sGame = document.getElementById('sGame');
+  const sPlayer = document.getElementById('sPlayer');
+  const sBet = document.getElementById('sBet');
+  const sReward = document.getElementById('sReward');
+  const sBal = document.getElementById('sBal');
+  const sRef = document.getElementById('sRef');
+
+  function openModal(item){
+    modalGame.textContent = item.game;
+    modalSub.textContent = 'Detailed Receipt';
+    modalBadge.textContent = item.game.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
+    modalPlayer.textContent = 'Player — ' + item.player.toUpperCase();
+    modalDate.textContent = item.date;
+    modalAmount.textContent = (item.amount >= 0 ? '+' : '-') + Math.abs(item.amount);
+
+    fGame.textContent = item.game;
+    fName.textContent = item.player;
+    fBet.textContent = formatCurrency(item.bet);
+    fReward.textContent = formatCurrency(item.reward);
+    fType.textContent = item.amount >= 0 ? 'PAYOUT' : 'BET';
+    fRef.textContent = item.id;
+
+    sStatus.textContent = item.status;
+    sDate.textContent = item.date;
+    sGame.textContent = item.game;
+    sPlayer.textContent = item.player;
+    sBet.textContent = formatCurrency(item.bet);
+    sReward.textContent = formatCurrency(item.reward);
+    sBal.textContent = formatCurrency(item.balanceAfter);
+    sRef.textContent = item.id;
+
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden','false');
+    // focus trap basics
+    document.getElementById('closeBtn').focus();
+  }
+
+  document.getElementById('closeBtn').addEventListener('click', closeModal);
+  overlay.addEventListener('click', (ev) => {
+    if(ev.target === overlay) closeModal();
+  });
+
+  function closeModal(){
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden','true');
+  }
+
+  // Search & filters
+  const searchInput = document.getElementById('search');
+  const filterAll = document.getElementById('filterAll');
+  const filterWin = document.getElementById('filterWin');
+  const filterBet = document.getElementById('filterBet');
+
+  function applyFilter(query='', mode='all'){
+    const q = query.trim().toLowerCase();
+    let items = data.filter(it => {
+      if(!q) return true;
+      return it.player.toLowerCase().includes(q) || it.game.toLowerCase().includes(q) || it.id.toLowerCase().includes(q);
+    });
+
+    if(mode === 'win'){
+      items = items.filter(it => it.reward > 0);
+    } else if(mode === 'bet'){
+      items = items.filter(it => it.amount < 0);
+    }
+    renderList(items);
+  }
+
+  searchInput.addEventListener('input', (e) => applyFilter(e.target.value));
+  filterAll.addEventListener('click', () => { applyFilter(searchInput.value,'all'); });
+  filterWin.addEventListener('click', () => { applyFilter(searchInput.value,'win'); });
+  filterBet.addEventListener('click', () => { applyFilter(searchInput.value,'bet'); });
+
+  // Print & Download (download as simple text receipt)
+  document.getElementById('printBtn').addEventListener('click', () => {
+    window.print();
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    // build a textual receipt from current modal fields
+    const lines = [
+      'DEWDROP — Transaction Receipt',
+      '-------------------------------',
+      'Game: ' + fGame.textContent,
+      'Player: ' + fName.textContent,
+      'Bet Amount: ' + fBet.textContent,
+      'Reward Amount: ' + fReward.textContent,
+      'Type: ' + fType.textContent,
+      'Reference: ' + fRef.textContent,
+      'Date: ' + sDate.textContent,
+      'Status: ' + sStatus.textContent,
+      'Balance After: ' + sBal.textContent,
+      '',
+      'Thank you for using Dewdrop.'
+    ];
+    const blob = new Blob([lines.join('\\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (fRef.textContent || 'receipt') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  // keyboard escape
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+
+  // Small accessibility: allow focusable rows
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && document.activeElement && document.activeElement.classList.contains('receipt')){
+      const id = document.activeElement.dataset.id;
+      const item = data.find(d => d.id === id);
+      if(item) openModal(item);
+    }
+  });
+
+  // After render: make receipt elements focusable for keyboard
+  function makeFocusable(){
+    document.querySelectorAll('.receipt').forEach(el => {
+      el.setAttribute('tabindex','0');
+      el.setAttribute('role','button');
+      el.style.outline = 'none';
+    });
+  }
+
+  // observe list changes to reassign focusable
+  const obs = new MutationObserver(() => makeFocusable());
+  obs.observe(listEl, { childList:true });
+  makeFocusable();
+
+</script>
+</body>
+</html>

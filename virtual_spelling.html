@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnglaBet - VirtualSpelling</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0a2e5a;
+            --secondary: #1a4789;
+            --accent: #4cc9f0;
+            --accent-gradient: linear-gradient(135deg, #4cc9f0, #4895ef);
+            --yellow: #ffcc00;
+            --yellow-gradient: linear-gradient(135deg, #ffcc00, #ffaa00);
+            --success: #4ade80;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-light: #ffffff;
+            --text-gray: #a0c1ed;
+            --card-bg: #1a3e75;
+            --card-dark: #0f2b50;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+            color: #333333;
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(10, 46, 90, 0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(10, 46, 90, 0.2);
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .user-balance {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .timer-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            border: 1px solid rgba(10, 46, 90, 0.1);
+            animation: slideUp 0.5s ease;
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(10, 46, 90, 0.1);
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .panel-title i {
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        /* Timer Styles */
+        .timer {
+            background: rgba(10, 46, 90, 0.1);
+            border-radius: 40px;
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(10, 46, 90, 0.2);
+            color: var(--primary);
+        }
+
+        .timer.running {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .timer.warning {
+            color: var(--warning);
+            border-color: var(--warning);
+            animation: pulse 1s infinite;
+        }
+
+        .timer.danger {
+            color: var(--danger);
+            border-color: var(--danger);
+            animation: pulse 0.5s infinite;
+        }
+
+        /* Word Level Selection - SMALLER BUTTONS */
+        .level-selection {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-bottom: 15px;
+        }
+
+        .level-card {
+            background: rgba(10, 46, 90, 0.05);
+            border-radius: 4px;
+            padding: 4px 2px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            font-size: 0.55rem;
+            min-height: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .level-card:hover {
+            transform: translateY(-1px);
+            background: rgba(10, 46, 90, 0.1);
+        }
+
+        .level-card.active {
+            border-color: var(--yellow);
+            background: var(--yellow);
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .level-number {
+            font-size: 0.6rem;
+            font-weight: bold;
+            margin-bottom: 1px;
+            color: inherit;
+        }
+
+        .level-word {
+            font-weight: 600;
+            font-size: 0.5rem;
+        }
+
+        .level-letters {
+            font-size: 0.45rem;
+            opacity: 0.8;
+            margin-top: 1px;
+        }
+
+        /* Game Stats */
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: rgba(10, 46, 90, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--yellow);
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--primary);
+            opacity: 0.7;
+        }
+
+        /* Betting Area */
+        .betting-area {
+            background: rgba(10, 46, 90, 0.05);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px dashed rgba(10, 46, 90, 0.2);
+        }
+
+        .betting-label {
+            font-size: 0.8rem;
+            color: var(--primary);
+            opacity: 0.7;
+            margin-bottom: 6px;
+        }
+
+        .bet-amount-container {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .bet-amount {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(10, 46, 90, 0.2);
+            border-radius: 6px;
+            color: var(--primary);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .bet-amount:focus {
+            outline: none;
+            border-color: var(--yellow);
+        }
+
+        .bet-amount::placeholder {
+            color: var(--primary);
+            opacity: 0.5;
+        }
+
+        .bet-button {
+            width: 100%;
+            padding: 10px;
+            background: var(--yellow-gradient);
+            border: none;
+            border-radius: 6px;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .bet-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 204, 0, 0.6);
+        }
+
+        .bet-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Target Word Display */
+        .target-word-container {
+            background: rgba(10, 46, 90, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            border: 2px dashed rgba(10, 46, 90, 0.2);
+        }
+
+        .target-label {
+            font-size: 0.8rem;
+            color: var(--primary);
+            opacity: 0.7;
+            margin-bottom: 6px;
+        }
+
+        .target-word {
+            font-size: 1.7rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: var(--yellow);
+            text-transform: uppercase;
+        }
+
+        /* Number Grid */
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .number-box {
+            background: rgba(10, 46, 90, 0.1);
+            border: 2px solid rgba(10, 46, 90, 0.2);
+            border-radius: 8px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+            color: var(--primary);
+        }
+
+        .number-box:hover {
+            transform: translateY(-3px);
+            border-color: var(--yellow);
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2);
+        }
+
+        .number-box.selected {
+            background: var(--yellow-gradient);
+            color: var(--primary);
+            border-color: var(--yellow);
+            transform: scale(1.03);
+        }
+
+        .number-box.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Player Word Area */
+        .player-word-area {
+            min-height: 80px;
+            padding: 12px;
+            background: rgba(10, 46, 90, 0.05);
+            border-radius: 8px;
+            border: 2px dashed rgba(10, 46, 90, 0.2);
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-letter {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid var(--yellow);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: popIn 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 204, 0, 0.1);
+            color: var(--primary);
+            min-width: 45px;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .placeholder-text {
+            color: var(--primary);
+            opacity: 0.5;
+            font-style: italic;
+            font-size: 0.8rem;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+
+        .btn-primary {
+            background: var(--yellow-gradient);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.4);
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 204, 0, 0.6);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(10, 46, 90, 0.3);
+        }
+
+        /* Recent Games Button */
+        .recent-games-btn {
+            background: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            margin: 15px auto;
+            width: fit-content;
+        }
+
+        .recent-games-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(10, 46, 90, 0.3);
+        }
+
+        /* Results Panel */
+        .results-panel {
+            background: rgba(10, 46, 90, 0.05);
+            border-left: 4px solid var(--yellow);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .results-panel.show {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            color: var(--yellow);
+        }
+
+        .results-header i {
+            font-size: 1.1rem;
+        }
+
+        .score-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(10, 46, 90, 0.2);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+            flex: 1;
+            min-width: 70px;
+        }
+
+        .score-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--yellow);
+        }
+
+        .score-label {
+            font-size: 0.65rem;
+            color: var(--primary);
+            opacity: 0.7;
+        }
+
+        /* Next Round Countdown */
+        .next-round-countdown {
+            text-align: center;
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(10, 46, 90, 0.05);
+            border-radius: 6px;
+            display: none;
+        }
+
+        .countdown-text {
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: var(--yellow);
+        }
+
+        .countdown-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(10, 46, 90, 0.2);
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--accent);
+            transform: rotate(90deg);
+        }
+
+        /* Game History */
+        .game-history {
+            margin-top: 20px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid rgba(10, 46, 90, 0.2);
+            font-weight: 600;
+            color: var(--yellow);
+        }
+
+        .history-table td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(10, 46, 90, 0.1);
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        .status.won {
+            background: rgba(76, 222, 128, 0.2);
+            color: var(--success);
+        }
+
+        .status.partial {
+            background: rgba(255, 204, 0, 0.2);
+            color: #b8860b;
+        }
+
+        .status.lost {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .user-letters {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+
+        .letter {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
+
+        .letter.correct {
+            background: rgba(76, 222, 128, 0.3);
+            color: var(--success);
+        }
+
+        .letter.incorrect {
+            background: rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-15px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.03); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(255, 204, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 250px;
+            font-size: 0.8rem;
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        .notification.info {
+            background: var(--accent);
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+            
+            .level-selection {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .number-grid {
+                grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+            }
+            
+            .number-box {
+                height: 45px;
+                font-size: 1rem;
+            }
+            
+            .target-word {
+                font-size: 1.5rem;
+            }
+            
+            .timer-container {
+                position: static;
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .panel {
+                padding: 12px;
+            }
+            
+            .level-selection {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-water"></i>
+                <h1>EnglaBet - VirtualSpelling</h1>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">JD</div>
+                <div class="user-details">
+                    <div class="user-name">John Doe</div>
+                    <div class="user-balance">₦12,500</div>
+                </div>
+            </div>
+            <div class="timer-container">
+                <div class="timer" id="timer">
+                    <i class="fas fa-clock"></i>
+                    <span id="timerValue">02:00</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="game-container">
+            <div class="panel">
+                <h2 class="panel-title"><i class="fas fa-gamepad"></i> Game Setup</h2>
+                
+                <div class="level-selection">
+                    <div class="level-card active" data-level="3">
+                        <div class="level-number">L3</div>
+                        <div class="level-word">3 Letters</div>
+                        <div class="level-letters">₦50</div>
+                    </div>
+                    <div class="level-card" data-level="4">
+                        <div class="level-number">L4</div>
+                        <div class="level-word">4 Letters</div>
+                        <div class="level-letters">₦100</div>
+                    </div>
+                    <div class="level-card" data-level="5">
+                        <div class="level-number">L5</div>
+                        <div class="level-word">5 Letters</div>
+                        <div class="level-letters">₦200</div>
+                    </div>
+                    <div class="level-card" data-level="6">
+                        <div class="level-number">L6</div>
+                        <div class="level-word">6 Letters</div>
+                        <div class="level-letters">₦500</div>
+                    </div>
+                    <div class="level-card" data-level="7">
+                        <div class="level-number">L7</div>
+                        <div class="level-word">7 Letters</div>
+                        <div class="level-letters">₦1,000</div>
+                    </div>
+                    <div class="level-card" data-level="8">
+                        <div class="level-number">L8</div>
+                        <div class="level-word">8 Letters</div>
+                        <div class="level-letters">₦2,000</div>
+                    </div>
+                    <div class="level-card" data-level="9">
+                        <div class="level-number">L9</div>
+                        <div class="level-word">9 Letters</div>
+                        <div class="level-letters">₦5,000</div>
+                    </div>
+                    <div class="level-card" data-level="10">
+                        <div class="level-number">L10</div>
+                        <div class="level-word">10 Letters</div>
+                        <div class="level-letters">₦10,000</div>
+                    </div>
+                </div>
+
+                <div class="betting-area">
+                    <div class="betting-label">Place Your Bet:</div>
+                    <div class="bet-amount-container">
+                        <input type="number" class="bet-amount" id="betAmount" placeholder="Enter amount..." min="50" max="10000">
+                    </div>
+                    <button class="bet-button" id="placeBetBtn">
+                        <i class="fas fa-coins"></i> Place Bet
+                    </button>
+                </div>
+
+                <div class="game-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="gamesPlayed">0</div>
+                        <div class="stat-label">Games Played</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="gamesWon">0</div>
+                        <div class="stat-label">Games Won</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="successRate">0%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                </div>
+
+                <div class="results-panel" id="resultsPanel">
+                    <div class="results-header">
+                        <i class="fas fa-trophy"></i>
+                        <h3>Game Results</h3>
+                    </div>
+                    <div id="resultsText">Waiting for results...</div>
+                    
+                    <div class="score-display">
+                        <div class="score-item">
+                            <div class="score-value" id="resultWinnings">₦0</div>
+                            <div class="score-label">Winnings</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-value" id="resultTime">0s</div>
+                            <div class="score-label">Time Used</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-value" id="resultLetters">0</div>
+                            <div class="score-label">Correct Letters</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="next-round-countdown" id="nextRoundCountdown">
+                    <div class="countdown-text">Next round starting in:</div>
+                    <div class="countdown-value" id="countdownValue">5</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2 class="panel-title"><i class="fas fa-spell-check"></i> Spelling Challenge</h2>
+                
+                <div class="target-word-container">
+                    <div class="target-label">Target Word:</div>
+                    <div class="target-word" id="targetWord">Select Letter & Place Bet</div>
+                </div>
+
+                <div class="number-grid" id="numberGrid">
+                    <!-- Numbers will be generated by JavaScript -->
+                </div>
+
+                <div class="player-word-area" id="playerWordArea">
+                    <p class="placeholder-text">Select numbers to reveal letters and build your word...</p>
+                </div>
+
+                <button class="recent-games-btn" id="recentGamesBtn">
+                    <i class="fas fa-history"></i> View Recent Games
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Games Modal -->
+    <div id="recentGamesModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Recent Games</div>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="game-history">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Word</th>
+                            <th>Bet</th>
+                            <th>Letters</th>
+                            <th>Result</th>
+                            <th>Winnings</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        <!-- History will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let currentLevel = 3;
+        let gameActive = false;
+        let timerInterval;
+        let timeLeft = 120; // 2 minutes in seconds
+        let selectedNumbers = [];
+        let targetWord = "";
+        let letterPool = [];
+        let playerWord = "";
+        let gameStartTime = 0;
+        let nextRoundCountdown = null;
+        let numberToLetterMap = {};
+        let currentBetAmount = 0;
+        let roundActive = false;
+
+        // DOM elements
+        const timerElement = document.getElementById('timer');
+        const timerValue = document.getElementById('timerValue');
+        const levelCards = document.querySelectorAll('.level-card');
+        const placeBetBtn = document.getElementById('placeBetBtn');
+        const betAmountInput = document.getElementById('betAmount');
+        const targetWordElement = document.getElementById('targetWord');
+        const numberGrid = document.getElementById('numberGrid');
+        const playerWordArea = document.getElementById('playerWordArea');
+        const resultsPanel = document.getElementById('resultsPanel');
+        const resultsText = document.getElementById('resultsText');
+        const resultWinnings = document.getElementById('resultWinnings');
+        const resultTime = document.getElementById('resultTime');
+        const resultLetters = document.getElementById('resultLetters');
+        const gamesPlayed = document.getElementById('gamesPlayed');
+        const gamesWon = document.getElementById('gamesWon');
+        const successRate = document.getElementById('successRate');
+        const nextRoundCountdownElement = document.getElementById('nextRoundCountdown');
+        const countdownValue = document.getElementById('countdownValue');
+        const historyBody = document.getElementById('historyBody');
+        const recentGamesBtn = document.getElementById('recentGamesBtn');
+        const recentGamesModal = document.getElementById('recentGamesModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        // Initialize the game
+        function initGame() {
+            // Set up level selection
+            levelCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    if (gameActive) return;
+                    
+                    levelCards.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentLevel = parseInt(this.getAttribute('data-level'));
+                    
+                    // Set default bet amount based on level
+                    const betAmounts = {
+                        3: 50, 4: 100, 5: 200, 6: 500, 
+                        7: 1000, 8: 2000, 9: 5000, 10: 10000
+                    };
+                    
+                    betAmountInput.value = betAmounts[currentLevel];
+                    currentBetAmount = betAmounts[currentLevel];
+                    
+                    updateTargetWord();
+                });
+            });
+
+            // Set up betting
+            placeBetBtn.addEventListener('click', placeBet);
+            betAmountInput.addEventListener('input', function() {
+                currentBetAmount = parseInt(this.value) || 0;
+            });
+
+            // Set up modal functionality
+            recentGamesBtn.addEventListener('click', () => {
+                recentGamesModal.style.display = 'flex';
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                recentGamesModal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            recentGamesModal.addEventListener('click', (e) => {
+                if (e.target === recentGamesModal) {
+                    recentGamesModal.style.display = 'none';
+                }
+            });
+
+            // Initialize with default level
+            const defaultLevel = document.querySelector('.level-card.active');
+            currentLevel = parseInt(defaultLevel.getAttribute('data-level'));
+            betAmountInput.value = 50;
+            currentBetAmount = 50;
+
+            // Start the round timer
+            startRoundTimer();
+        }
+
+        // Start the round timer (counts down from 120 seconds)
+        function startRoundTimer() {
+            // Load saved time from localStorage if available
+            const savedTime = localStorage.getItem('englabetRoundTime');
+            if (savedTime) {
+                timeLeft = parseInt(savedTime);
+            } else {
+                timeLeft = 120;
+            }
+            
+            updateTimerDisplay();
+            
+            // Clear any existing timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            // Start new timer
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                // Save current time to localStorage
+                localStorage.setItem('englabetRoundTime', timeLeft.toString());
+                
+                if (timeLeft <= 0) {
+                    // End of round - reset timer and start new round
+                    timeLeft = 120;
+                    localStorage.setItem('englabetRoundTime', '120');
+                    updateTimerDisplay();
+                    
+                    // Reset game state for new round
+                    resetGameForNewRound();
+                    
+                    // Show notification
+                    showNotification('New round started! Place your bets.', 'info');
+                }
+            }, 1000);
+        }
+
+        // Reset game state for new round
+        function resetGameForNewRound() {
+            gameActive = false;
+            selectedNumbers = [];
+            playerWord = "";
+            
+            // Update UI
+            updatePlayerWordArea();
+            updateControls();
+            resultsPanel.classList.remove('show');
+            nextRoundCountdownElement.style.display = 'none';
+            
+            // Reset timer display
+            timerElement.className = 'timer';
+            timerValue.textContent = '02:00';
+            
+            // Get a new word for the next round
+            updateTargetWord();
+            
+            // Clear number grid
+            numberGrid.innerHTML = '';
+        }
+
+        // Update target word based on selected level
+        async function updateTargetWord() {
+            try {
+                // Get a random word for the selected level
+                targetWord = await getRandomWord(currentLevel);
+                targetWordElement.textContent = targetWord.toUpperCase();
+                placeBetBtn.disabled = false;
+            } catch (error) {
+                console.error('Failed to fetch word:', error);
+                // If API fails, show error
+                targetWordElement.textContent = "Check Your Internet Connection";
+                placeBetBtn.disabled = true;
+                showNotification('Unable to connect to dictionary services. Please check your internet connection.', 'error');
+            }
+        }
+
+        // Get a random word for the specified length
+        async function getRandomWord(length) {
+            // Use a comprehensive word list for each level
+            const wordLists = {
+                3: ["CAT", "DOG", "SUN", "CAR", "BAG", "HAT", "BED", "MAP", "KEY", "CUP", "PEN", "BOX", "TEA", "EGG", "ICE", "JOB", "LEG", "MAN", "NET", "OWL"],
+                4: ["BOOK", "DESK", "DOOR", "FISH", "BALL", "CAKE", "TREE", "MOON", "STAR", "FOOD", "HOME", "LAMP", "MILK", "ROAD", "SHIP", "TIME", "WIND", "YEAR", "ZONE", "FIRE"],
+                5: ["HOUSE", "PHONE", "WATER", "TABLE", "CHAIR", "MONEY", "PAPER", "MUSIC", "NIGHT", "LIGHT", "APPLE", "BEACH", "CLOUD", "DREAM", "EARTH", "FRUIT", "GLASS", "HONEY", "IMAGE", "JUICE"],
+                6: ["OFFICE", "PENCIL", "FRIEND", "FAMILY", "SCHOOL", "NUMBER", "PERSON", "SUMMER", "WINTER", "SPRING", "BOTTLE", "CIRCLE", "DANGER", "EFFECT", "GARDEN", "HEALTH", "ISLAND", "JUNGLE", "KETTLE", "LETTER"],
+                7: ["BICYCLE", "TEACHER", "COUNTRY", "PICTURE", "MORNING", "EVENING", "WEATHER", "HOLIDAY", "WEEKEND", "PROBLEM", "ANIMAL", "CAPITAL", "DISEASE", "EXAMPLE", "FACTORY", "GENERAL", "HISTORY", "JOURNEY", "LIBRARY", "MACHINE"],
+                8: ["COMPUTER", "LANGUAGE", "QUESTION", "BUILDING", "BUSINESS", "CHILDREN", "HOSPITAL", "MAGAZINE", "PRESIDENT", "UNIVERSITY", "AIRPLANE", "BIRTHDAY", "CAMPAIGN", "DIAMOND", "ELEPHANT", "FOOTBALL", "GOVERNOR", "HAMBURGER", "INTERNET", "JELLYFISH"],
+                9: ["DIRECTION", "EDUCATION", "GOVERNMENT", "INFORMATION", "KNOWLEDGE", "TELEVISION", "TRANSPORT", "VACATION", "ADVENTURE", "BEAUTIFUL", "CELEBRATE", "DEVELOPER", "EVERYTHING", "FURNITURE", "GENERATOR", "HAPPINESS", "IMPORTANT", "JUSTICE", "KANGAROO", "LANDSCAPE"],
+                10: ["EXPERIENCE", "IMPORTANCE", "MANAGEMENT", "OPPORTUNITY", "POPULATION", "RESTAURANT", "TELEPHONE", "UNDERSTAND", "YELLOWSTONE", "ADVERTISING", "BASKETBALL", "CELEBRATION", "DEMONSTRATE", "EVERYWHERE", "FINGERPRINT", "GRADUATION", "HURRICANE", "ILLUSTRATE", "JOURNALISM", "KINDERGARTEN"]
+            };
+            
+            // Get the word list for the current level
+            const wordList = wordLists[length] || wordLists[3];
+            
+            // Return a random word from the list
+            return wordList[Math.floor(Math.random() * wordList.length)].toLowerCase();
+        }
+
+        // Place a bet and start the game
+        async function placeBet() {
+            if (gameActive) return;
+            
+            // Validate bet amount
+            if (!currentBetAmount || currentBetAmount < 50) {
+                showNotification('Minimum bet amount is ₦50', 'error');
+                return;
+            }
+            
+            // Get a new word for this round
+            await updateTargetWord();
+            
+            // Check if we have a valid word
+            if (!targetWord || targetWord === "Check Your Internet Connection") {
+                showNotification('Unable to fetch a word. Please check your internet connection.', 'error');
+                return;
+            }
+            
+            gameActive = true;
+            gameStartTime = Date.now();
+            
+            // Reset game state
+            selectedNumbers = [];
+            playerWord = "";
+            
+            // Update UI
+            updatePlayerWordArea();
+            updateTimerDisplay();
+            generateNumberPool();
+            updateControls();
+            
+            // Hide results and countdown
+            resultsPanel.classList.remove('show');
+            nextRoundCountdownElement.style.display = 'none';
+            
+            // Auto-scroll to the number grid
+            document.querySelector('.number-grid').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+            
+            // Show notification
+            showNotification(`Bet placed! Spell "${targetWord.toUpperCase()}" by selecting numbers.`, 'info');
+        }
+
+        // Generate number pool that maps to letters
+        function generateNumberPool() {
+            numberGrid.innerHTML = '';
+            letterPool = [];
+            numberToLetterMap = {};
+            
+            // Add correct letters from target word
+            const correctLetters = targetWord.toUpperCase().split('');
+            letterPool.push(...correctLetters);
+            
+            // Add extra letters (3-5 depending on level)
+            const extraCount = Math.min(5, Math.max(3, currentLevel));
+            const extraLetters = generateExtraLetters(extraCount, correctLetters);
+            letterPool.push(...extraLetters);
+            
+            // Shuffle the letter pool
+            shuffleArray(letterPool);
+            
+            // Create mapping from numbers to letters
+            letterPool.forEach((letter, index) => {
+                numberToLetterMap[index + 1] = letter;
+            });
+            
+            // Create number boxes (show numbers instead of letters)
+            for (let i = 1; i <= letterPool.length; i++) {
+                const numberBox = document.createElement('div');
+                numberBox.className = 'number-box';
+                numberBox.textContent = i;
+                numberBox.dataset.number = i;
+                
+                numberBox.addEventListener('click', () => {
+                    selectNumber(i, numberBox);
+                });
+                
+                numberGrid.appendChild(numberBox);
+            }
+        }
+
+        // Generate extra letters that are not in the target word
+        function generateExtraLetters(count, correctLetters) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const extraLetters = [];
+            
+            // Filter out letters that are in the target word
+            const availableLetters = alphabet.split('').filter(letter => 
+                !correctLetters.includes(letter)
+            );
+            
+            // Select random letters
+            for (let i = 0; i < count; i++) {
+                if (availableLetters.length === 0) break;
+                
+                const randomIndex = Math.floor(Math.random() * availableLetters.length);
+                extraLetters.push(availableLetters[randomIndex]);
+                availableLetters.splice(randomIndex, 1);
+            }
+            
+            return extraLetters;
+        }
+
+        // Shuffle array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Select a number from the grid - FINAL SELECTION (cannot be changed)
+        function selectNumber(number, element) {
+            if (!gameActive) {
+                showNotification('Please place a bet first', 'error');
+                return;
+            }
+            
+            // Check if this number is already selected
+            if (selectedNumbers.includes(number)) {
+                showNotification('Letter already selected! Selection is final.', 'error');
+                return;
+            }
+            
+            // Check if we've reached the word length limit
+            if (selectedNumbers.length >= targetWord.length) {
+                showNotification(`You can only select ${targetWord.length} letters for this word.`, 'error');
+                return;
+            }
+            
+            // Select the number (FINAL - cannot be changed)
+            selectedNumbers.push(number);
+            element.classList.add('selected');
+            element.classList.add('disabled'); // Disable after selection
+            
+            // Update player word (convert numbers to letters)
+            playerWord = selectedNumbers.map(n => numberToLetterMap[n]).join('');
+            updatePlayerWordArea();
+            
+            // Auto-submit when all letters are selected
+            if (selectedNumbers.length === targetWord.length) {
+                setTimeout(() => {
+                    submitWord();
+                }, 500);
+            }
+        }
+
+        // Update player word area display
+        function updatePlayerWordArea() {
+            playerWordArea.innerHTML = '';
+            
+            if (playerWord.length === 0) {
+                playerWordArea.innerHTML = '<p class="placeholder-text">Select numbers to reveal letters and build your word...</p>';
+                return;
+            }
+            
+            // Create letter elements for the player's word
+            playerWord.split('').forEach((letter, index) => {
+                const letterElement = document.createElement('div');
+                letterElement.className = 'player-letter';
+                letterElement.textContent = letter;
+                playerWordArea.appendChild(letterElement);
+            });
+        }
+
+        // Update control buttons state
+        function updateControls() {
+            placeBetBtn.disabled = gameActive;
+        }
+
+        // Submit the word for validation
+        function submitWord() {
+            if (!gameActive) return;
+            
+            const timeUsed = Math.floor((Date.now() - gameStartTime) / 1000);
+            const correctLetters = countCorrectLetters();
+            
+            // End the game
+            endGame(correctLetters, timeUsed);
+        }
+
+        // Count how many letters are correct (can form the target word)
+        function countCorrectLetters() {
+            const targetLetters = targetWord.toUpperCase().split('');
+            const playerLetters = playerWord.split('');
+            
+            // Create copies to avoid modifying the original arrays
+            let targetCopy = [...targetLetters];
+            let playerCopy = [...playerLetters];
+            
+            // Count matching letters (order doesn't matter)
+            let correctCount = 0;
+            
+            for (let i = 0; i < playerCopy.length; i++) {
+                const index = targetCopy.indexOf(playerCopy[i]);
+                if (index !== -1) {
+                    correctCount++;
+                    targetCopy.splice(index, 1); // Remove the matched letter
+                }
+            }
+            
+            return correctCount;
+        }
+
+        // End the game
+        function endGame(correctLetters, timeUsed) {
+            gameActive = false;
+            
+            // Calculate winnings based on correct letters
+            const totalLetters = targetWord.length;
+            const failedLetters = totalLetters - correctLetters;
+            
+            // New winning logic:
+            // - If 0 failed letters: full win (2x bet)
+            // - If 1 failed letter: partial win (50% of bet returned)
+            // - If 2 failed letters: partial win (25% of bet returned)
+            // - If 3+ failed letters: no win
+            let winnings = 0;
+            if (failedLetters === 0) {
+                winnings = currentBetAmount * 2;
+            } else if (failedLetters === 1) {
+                winnings = Math.floor(currentBetAmount * 0.5);
+            } else if (failedLetters === 2) {
+                winnings = Math.floor(currentBetAmount * 0.25);
+            } else {
+                winnings = 0;
+            }
+            
+            // Determine result status
+            let resultStatus, resultMessage;
+            if (failedLetters === 0) {
+                resultStatus = "won";
+                resultMessage = `Congratulations! You correctly spelled "<strong>${targetWord.toUpperCase()}</strong>"!`;
+            } else if (failedLetters === 1) {
+                resultStatus = "partial";
+                resultMessage = `You got ${correctLetters} out of ${totalLetters} letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+            } else if (failedLetters === 2) {
+                resultStatus = "partial";
+                resultMessage = `You got ${correctLetters} out of ${totalLetters} letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+            } else {
+                resultStatus = "lost";
+                resultMessage = `You didn't get enough letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+            }
+            
+            // Update results panel
+            resultsText.innerHTML = resultMessage;
+            
+            resultWinnings.textContent = `₦${winnings}`;
+            resultTime.textContent = `${timeUsed}s`;
+            resultLetters.textContent = `${correctLetters}/${totalLetters}`;
+            
+            resultsPanel.classList.add('show');
+            
+            // Update game stats and history
+            const isFullWin = failedLetters === 0;
+            updateGameStats(isFullWin);
+            
+            // Get which letters were correct/incorrect
+            const letterAnalysis = analyzeLetters();
+            addToHistory(targetWord.toUpperCase(), currentBetAmount, resultStatus, winnings, letterAnalysis);
+            
+            // Show notification
+            if (failedLetters === 0) {
+                showNotification(`Perfect! You won ₦${winnings}!`, 'success');
+            } else if (failedLetters === 1) {
+                showNotification(`Good try! You won ₦${winnings} for ${correctLetters} correct letters.`, 'info');
+            } else if (failedLetters === 2) {
+                showNotification(`Good effort! You won ₦${winnings} for ${correctLetters} correct letters.`, 'info');
+            } else {
+                showNotification(`Better luck next time! The word was "${targetWord.toUpperCase()}".`, 'error');
+            }
+            
+            updateControls();
+        }
+
+        // Analyze which letters were correct/incorrect
+        function analyzeLetters() {
+            const targetLetters = targetWord.toUpperCase().split('');
+            const playerLetters = playerWord.split('');
+            const result = [];
+            
+            // Create copies to avoid modifying the original arrays
+            let targetCopy = [...targetLetters];
+            
+            for (let i = 0; i < playerLetters.length; i++) {
+                const index = targetCopy.indexOf(playerLetters[i]);
+                if (index !== -1) {
+                    result.push({ letter: playerLetters[i], correct: true });
+                    targetCopy.splice(index, 1); // Remove the matched letter
+                } else {
+                    result.push({ letter: playerLetters[i], correct: false });
+                }
+            }
+            
+            return result;
+        }
+
+        // Update game statistics
+        function updateGameStats(isWin) {
+            // In a real app, this would update from a database
+            // For demo purposes, we'll just increment values
+            const played = parseInt(gamesPlayed.textContent) + 1;
+            const won = parseInt(gamesWon.textContent) + (isWin ? 1 : 0);
+            const rate = Math.round((won / played) * 100);
+            
+            gamesPlayed.textContent = played;
+            gamesWon.textContent = won;
+            successRate.textContent = `${rate}%`;
+        }
+
+        // Add game to history
+        function addToHistory(word, bet, resultStatus, winnings, letterAnalysis) {
+            const newRow = document.createElement('tr');
+            
+            let statusText, statusClass;
+            if (resultStatus === "won") {
+                statusText = "Won";
+                statusClass = "won";
+            } else if (resultStatus === "partial") {
+                statusText = "Partial";
+                statusClass = "partial";
+            } else {
+                statusText = "Lost";
+                statusClass = "lost";
+            }
+            
+            // Create letter display
+            const lettersHtml = document.createElement('div');
+            lettersHtml.className = 'user-letters';
+            
+            letterAnalysis.forEach(item => {
+                const letterSpan = document.createElement('span');
+                letterSpan.className = `letter ${item.correct ? 'correct' : 'incorrect'}`;
+                letterSpan.textContent = item.letter;
+                lettersHtml.appendChild(letterSpan);
+            });
+            
+            newRow.innerHTML = `
+                <td>${word}</td>
+                <td>₦${bet}</td>
+                <td></td>
+                <td><span class="status ${statusClass}">${statusText}</span></td>
+                <td>₦${winnings}</td>
+            `;
+            
+            // Add the letters to the third cell
+            newRow.cells[2].appendChild(lettersHtml);
+            
+            // Add to the beginning of the table
+            historyBody.insertBefore(newRow, historyBody.firstChild);
+            
+            // Limit to 10 entries
+            if (historyBody.children.length > 10) {
+                historyBody.removeChild(historyBody.lastChild);
+            }
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerValue.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update timer styling based on time remaining
+            timerElement.className = 'timer';
+            if (timeLeft <= 30) {
+                timerElement.classList.add('danger');
+            } else if (timeLeft <= 60) {
+                timerElement.classList.add('warning');
+            } else {
+                timerElement.classList.add('running');
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
