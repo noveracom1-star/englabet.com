@@ -255,6 +255,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     .meta .small {
@@ -263,6 +264,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     .middle {
@@ -416,12 +418,15 @@
       margin-bottom: 20px;
       padding-bottom: 16px;
       border-bottom: 1px solid rgba(0,0,0,0.06);
+      gap: 12px;
     }
 
     .receipt-simple .header .left {
       display: flex;
       gap: 12px;
       align-items: center;
+      flex: 1;
+      min-width: 0;
     }
 
     .receipt-simple .header .badge {
@@ -440,6 +445,7 @@
 
     .receipt-simple .header .player-info {
       min-width: 0;
+      flex: 1;
     }
 
     .receipt-simple .header .player-name {
@@ -449,18 +455,24 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     .receipt-simple .header .player-date {
       color:var(--muted);
       font-size: 12px;
       margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     .receipt-simple .header .amount {
       font-weight:900;
       font-size: 20px;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .receipt-simple .header .amount.plus {
@@ -500,6 +512,9 @@
       text-align: right;
       font-size: 14px;
       color: var(--ocean-900);
+      max-width: 60%;
+      word-break: break-word;
+      text-align: right;
     }
 
     .receipt-simple .actions {
@@ -906,31 +921,24 @@
       snapshot.forEach(doc => {
         const data = doc.data();
         
-        // Extract the user name correctly
-        let playerName = currentUser.displayName || currentUser.email || 'Unknown Player';
-        
-        // Extract game name correctly
-        let gameName = 'Dewdrop Challenge';
-        
-        // Extract words played and word bag
-        const wordsPlayed = data.words || [];
-        const wordBag = data.wordBag || [];
-        const validWords = data.validWords || [];
-        
+        // Map Firestore fields to our transaction structure
         transactions.push({
           id: doc.id,
-          game: gameName,
-          player: playerName,
+          game: data.gameName || 'Unknown Game',
+          player: data.userName || data.userEmail || 'Unknown Player',
           bet: data.betAmount || 0,
-          reward: data.result >= 0 ? data.result : 0,
-          amount: data.result || 0,
+          reward: data.reward || 0,
+          amount: data.amountWonLost || 0,
           date: data.date || new Date().toISOString(),
-          status: data.result >= 0 ? 'WIN' : 'LOSE',
-          balanceAfter: data.balance || 0,
-          ref: doc.id,
-          wordsPlayed: wordsPlayed,
-          wordBag: wordBag,
-          validWords: validWords
+          status: data.status || 'UNKNOWN',
+          balanceAfter: data.finalBalance || 0,
+          ref: data.betId || data.ref || doc.id,
+          wordsPlayed: data.wordsPlayed || [],
+          wordBag: data.wordBag || [],
+          validWords: data.validWords || [],
+          wordsCount: data.wordsCount || 0,
+          keyLetter: data.keyLetter || '',
+          session: data.session || ''
         });
       });
 
@@ -944,7 +952,7 @@
   // Create transaction row
   function createRow(item){
     const r = document.createElement('div');
-    r.className = `receipt ${item.amount >= 0 ? 'win' : 'lose'}`;
+    r.className = `receipt ${item.status === 'WIN' ? 'win' : 'lose'}`;
     r.dataset.id = item.id;
 
     // left
@@ -976,7 +984,7 @@
     tag.textContent = item.status;
     const note = document.createElement('div');
     note.className = 'note';
-    note.textContent = 'Ref: ' + item.id;
+    note.textContent = 'Ref: ' + item.ref.substring(0, 8) + '...';
 
     middle.appendChild(tag);
     middle.appendChild(note);
@@ -1081,7 +1089,7 @@
     sBet.textContent = formatCurrency(item.bet);
     sReward.textContent = formatCurrency(item.reward);
     sBal.textContent = formatCurrency(item.balanceAfter);
-    sRef.textContent = item.id;
+    sRef.textContent = item.ref;
 
     overlay.classList.add('open');
     overlay.setAttribute('aria-hidden','false');
@@ -1172,7 +1180,6 @@
       if(!q) return true;
       return it.player.toLowerCase().includes(q) || 
              it.game.toLowerCase().includes(q) || 
-             it.id.toLowerCase().includes(q) ||
              it.ref.toLowerCase().includes(q);
     });
 
