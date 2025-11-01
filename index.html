@@ -50,6 +50,7 @@
             display: flex;
             align-items: center;
             flex: 1;
+            gap: 5px; /* Reduced gap to bring logo and text closer */
         }
         .logo-img {
             width: 150px;
@@ -62,6 +63,13 @@
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+        }
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-left: -110px; /* Negative margin to pull text closer to logo */
         }
         .auth-buttons {
             display: flex;
@@ -232,7 +240,6 @@
             font-size: 12px;
             font-weight: 500;
         }
-        /* Animations */
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -341,59 +348,53 @@
         <header>
             <div class="logo">
                 <div class="logo-img">
-                    <!-- Custom logo image -->
                     <img src="englabet.png" alt="EnglaBet Logo">
                 </div>
+                <div class="logo-text">EnglaBet</div>
             </div>
             <div class="auth-buttons">
                 <button class="btn btn-login" id="loginBtn">Login</button>
                 <button class="btn btn-register" id="registerBtn">Register</button>
             </div>
         </header>
+
         <div class="sports-nav">
             <div class="sport-item sport-active" data-screen="home">
-                <div class="sport-icon">
-                    <i class="fas fa-home"></i>
-                </div>
+                <div class="sport-icon"><i class="fas fa-home"></i></div>
                 <div class="sport-name">Home</div>
             </div>
             <div class="sport-item" data-screen="wordbet">
-                <div class="sport-icon">
-                    <i class="fas fa-font"></i>
-                </div>
+                <div class="sport-icon"><i class="fas fa-font"></i></div>
                 <div class="sport-name">WordBet</div>
             </div>
             <div class="sport-item" data-screen="spelling">
-                <div class="sport-icon">
-                    <i class="fas fa-spell-check"></i>
-                </div>
+                <div class="sport-icon"><i class="fas fa-spell-check"></i></div>
                 <div class="sport-name">Spelling</div>
             </div>
             <div class="sport-item" data-screen="syntaxbet">
-                <div class="sport-icon">
-                    <i class="fas fa-code"></i>
-                </div>
+                <div class="sport-icon"><i class="fas fa-code"></i></div>
                 <div class="sport-name">SyntaxBet</div>
             </div>
         </div>
+
         <div class="game-types">
             <div class="game-type game-type-active">All Games</div>
-            <div class="game-type">Live</div>
+            <div class="game-type">Active</div>
             <div class="game-type">DEWDROP</div>
             <div class="game-type">AWL FAST LANE</div>
             <div class="game-type">MIDDAY EXIT</div>
             <div class="game-type">Upcoming</div>
             <div class="game-type">Popular</div>
         </div>
+
         <!-- Home Screen Content -->
         <div id="home-screen" class="screen-content">
-            <!-- Promotional Banner -->
             <div class="promo-banner">
                 <div class="promo-title">Welcome Bonus!</div>
                 <div class="promo-text">Get 200% bonus on your first deposit</div>
                 <button class="promo-btn" onclick="window.location.href='login.html'">Claim Now</button>
             </div>
-            <!-- Quick Access Menu -->
+
             <div class="quick-access">
                 <div class="quick-item" onclick="window.location.href='login.html'">
                     <div class="quick-icon"><i class="fas fa-coins"></i></div>
@@ -412,8 +413,7 @@
                     <div class="quick-text">History</div>
                 </div>
             </div>
-            
-            <!-- Footer Section -->
+
             <div class="footer">
                 <div class="footer-links">
                     <div class="footer-link" onclick="navigateTo('terms')">Terms & Conditions</div>
@@ -429,7 +429,8 @@
                 </div>
             </div>
         </div>
-        <!-- Empty Screens for Navigation Items -->
+
+        <!-- Empty Screens -->
         <div id="wordbet-screen" class="empty-screen">
             <div class="empty-icon"><i class="fas fa-font"></i></div>
             <div class="empty-title">WordBet</div>
@@ -448,12 +449,7 @@
             <div class="empty-text"></div>
             <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
         </div>
-        <div id="me-screen" class="empty-screen">
-            <div class="empty-icon"><i class="fas fa-user"></i></div>
-            <div class="empty-title">My Account</div>
-            <div class="empty-text"></div>
-            <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
-        </div>
+
         <!-- Footer Screens -->
         <div id="terms-screen" class="empty-screen">
             <div class="empty-icon"><i class="fas fa-file-contract"></i></div>
@@ -492,61 +488,51 @@
             <button class="empty-btn" onclick="navigateTo('home')">Back to Home</button>
         </div>
     </div>
-    <!-- Scroll to Top Button -->
+
     <div class="scroll-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">
         <i class="fas fa-arrow-up"></i>
     </div>
 
     <!-- Firebase Module Import (Updated) -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
         import { getFirestore } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
-  apiKey: "AIzaSyDivFTAKUznc1xryU8marfMDZG3v1eYsl8",
-  authDomain: "englabet-ad1fe.firebaseapp.com",
-  projectId: "englabet-ad1fe",
-  storageBucket: "englabet-ad1fe.firebasestorage.app",
-  messagingSenderId: "124544822433",
-  appId: "1:124544822433:web:c77c980f28c99364c214e0",
-  measurementId: "G-JMYYM433R7"
-};
+            apiKey: "AIzaSyDivFTAKUznc1xryU8marfMDZG3v1eYsl8",
+            authDomain: "englabet-ad1fe.firebaseapp.com",
+            projectId: "englabet-ad1fe",
+            storageBucket: "englabet-ad1fe.firebasestorage.app",
+            messagingSenderId: "124544822433",
+            appId: "1:124544822433:web:c77c980f28c99364c214e0",
+            measurementId: "G-JMYYM433R7"
+        };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Navigation functionality
         function navigateTo(screenId) {
-            // Hide all screens
             document.querySelectorAll('.screen-content, .empty-screen').forEach(screen => {
                 screen.style.display = 'none';
             });
-            // Show the selected screen
             if (screenId === 'home') {
                 document.getElementById('home-screen').style.display = 'block';
             } else {
                 document.getElementById(`${screenId}-screen`).style.display = 'block';
             }
-            // Update active states
             document.querySelectorAll('.sport-item').forEach(item => {
                 item.classList.remove('sport-active');
             });
-            // Set active state for the clicked item
             document.querySelectorAll(`[data-screen="${screenId}"]`).forEach(item => {
                 item.classList.add('sport-active');
             });
-            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Set up navigation event listeners
         document.querySelectorAll('.sport-item').forEach(item => {
             item.addEventListener('click', function() {
                 const screenId = this.getAttribute('data-screen');
@@ -554,7 +540,6 @@
             });
         });
 
-        // Show/hide scroll to top button based on scroll position
         window.addEventListener('scroll', function() {
             const scrollTop = document.querySelector('.scroll-top');
             if (window.pageYOffset > 300) {
@@ -564,7 +549,6 @@
             }
         });
 
-        // Authentication button handlers
         document.getElementById('loginBtn').addEventListener('click', function() {
             window.location.href = 'login.html';
         });
@@ -572,7 +556,6 @@
             window.location.href = 'signup.html';
         });
 
-        // Initialize the page with home screen
         navigateTo('home');
     </script>
 </body>

@@ -1,614 +1,762 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Transaction History — Dewdrop</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<style>
-  :root{
-    --ocean-900: #003f63;
-    --ocean-700: #0072a8;
-    --ocean-500: #00a0ff;
-    --ocean-300: #7fd1ff;
-    --white: #ffffff;
-    --muted: #6b7280;
-    --glass: rgba(255,255,255,0.08);
-    --card-radius: 12px;
-    --shadow-lg: 0 10px 30px rgba(3,10,34,0.25);
-    --shadow-md: 0 6px 18px rgba(3,10,34,0.12);
-    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-
-  html,body{
-    height:100%;
-    margin:0;
-    padding:0;
-    background: linear-gradient(180deg, #eaf8ff 0%, #f7fbff 100%);
-    color: #0b1220;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    overflow-x: hidden;
-  }
-
-  /* Page container - MOBILE FIRST */
-  .page {
-    width: 100%;
-    margin: 0 auto;
-    padding: 16px;
-    box-sizing: border-box;
-    min-height: 100vh;
-  }
-
-  header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-
-  .brand {
-    display:flex;
-    align-items:center;
-    gap: 10px;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .logo {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow: var(--shadow-md);
-    color:var(--white);
-    font-weight:800;
-    font-size: 16px;
-    letter-spacing:0.6px;
-    flex-shrink: 0;
-  }
-
-  .brand-text {
-    min-width: 0;
-  }
-
-  h1 {
-    margin:0;
-    font-size: 18px;
-    font-weight:700;
-    color:var(--ocean-900);
-    line-height: 1.2;
-  }
-
-  .sub {
-    color:var(--muted);
-    font-size: 12px;
-    margin-top: 2px;
-  }
-
-  /* Controls */
-  .controls {
-    display:flex;
-    gap: 8px;
-    align-items:center;
-    width: 100%;
-    margin-top: 12px;
-    order: 3;
-  }
-
-  .search {
-    background:var(--white);
-    border-radius: 12px;
-    padding: 10px 14px;
-    box-shadow: var(--shadow-md);
-    display:flex;
-    gap: 8px;
-    align-items:center;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .search input{
-    border:0;
-    outline:none;
-    font-size: 14px;
-    width: 100%;
-    background: transparent;
-  }
-
-  .filter-btn{
-    background:var(--white);
-    border:1px solid rgba(0,0,0,0.06);
-    padding: 10px 12px;
-    border-radius: 10px;
-    font-weight:600;
-    cursor:pointer;
-    box-shadow:var(--shadow-md);
-    font-size: 13px;
-    white-space: nowrap;
-  }
-
-  .filter-btn.active {
-    background: linear-gradient(90deg,var(--ocean-700), var(--ocean-500));
-    color: var(--white);
-  }
-
-  /* List container */
-  .list {
-    display:flex;
-    flex-direction:column;
-    gap: 12px;
-    margin-top: 16px;
-  }
-
-  /* Loading state */
-  .loading {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--muted);
-    font-size: 14px;
-  }
-
-  .loading-spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid var(--ocean-300);
-    border-top: 2px solid var(--ocean-700);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 12px;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  /* Empty state */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--muted);
-  }
-
-  .empty-state svg {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-  }
-
-  /* Receipt row (horizontal) */
-  .receipt {
-    background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
-    border-radius: var(--card-radius);
-    padding: 14px;
-    display:flex;
-    align-items:center;
-    gap: 12px;
-    cursor:pointer;
-    border-left: 4px solid transparent;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: var(--shadow-md);
-    position: relative;
-  }
-
-  .receipt.win {
-    border-left-color: #0a8f3c;
-  }
-
-  .receipt.lose {
-    border-left-color: #d63d3d;
-  }
-
-  .receipt:hover{
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .receipt .left {
-    display:flex;
-    align-items:center;
-    gap: 10px;
-    min-width: 0;
-    flex: 1;
-  }
-
-  .game-badge {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
-    color:var(--white);
-    font-weight:800;
-    font-size: 12px;
-    box-shadow: 0 4px 12px rgba(0,112,168,0.25);
-    flex-shrink:0;
-  }
-
-  .meta {
-    display:flex;
-    flex-direction:column;
-    gap: 4px;
-    min-width: 0;
-    flex: 1;
-  }
-
-  .meta .title {
-    font-weight:700;
-    color:var(--ocean-900);
-    letter-spacing:0.4px;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .meta .small {
-    font-size: 12px;
-    color:var(--muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .middle {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-
-  .tag {
-    font-size: 11px;
-    padding: 6px 8px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(0,160,255,0.07), rgba(0,112,168,0.04));
-    color:var(--ocean-700);
-    font-weight:600;
-    border:1px solid rgba(0,112,168,0.06);
-    white-space: nowrap;
-  }
-
-  .amount {
-    font-weight:800;
-    font-size: 16px;
-    white-space: nowrap;
-  }
-
-  .amount.plus{
-    color: #0a8f3c;
-  }
-
-  .amount.minus{
-    color: #d63d3d;
-  }
-
-  /* small note */
-  .note {
-    display:block;
-    color:var(--muted);
-    font-size: 11px;
-    white-space: nowrap;
-  }
-
-  /* Modal (pop-out) */
-  .overlay {
-    position:fixed;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background: rgba(3,10,34,0.45);
-    backdrop-filter: blur(4px);
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .22s ease;
-    z-index:60;
-    padding: 16px;
-    box-sizing: border-box;
-  }
-
-  .overlay.open{
-    opacity:1;
-    pointer-events:auto;
-  }
-
-  .modal {
-    width: 100%;
-    max-width: 500px;
-    max-height:90vh;
-    overflow:auto;
-    border-radius:16px;
-    background: linear-gradient(180deg, var(--white), #fbfeff);
-    box-shadow: 0 20px 50px rgba(3,10,34,0.45);
-    transform: translateY(10px) scale(.99);
-    transition: transform .28s cubic-bezier(.2,.9,.3,1);
-    position:relative;
-    border:1px solid rgba(0,0,0,0.04);
-  }
-
-  .overlay.open .modal{
-    transform: translateY(0) scale(1);
-  }
-
-  .modal-header {
-    background: linear-gradient(135deg, var(--ocean-700), var(--ocean-500));
-    padding: 20px 20px 16px 20px;
-    border-top-left-radius:16px;
-    border-top-right-radius:16px;
-    color:var(--white);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-  }
-
-  .modal-header .center-title{
-    display:flex;
-    align-items:center;
-    gap: 8px;
-    flex-direction:column;
-    text-align:center;
-  }
-
-  .modal-header .game-big {
-    font-size: 18px;
-    font-weight:800;
-    letter-spacing:0.8px;
-  }
-
-  .modal-header .sub-title {
-    font-size: 12px;
-    opacity:0.95;
-    font-weight:600;
-  }
-
-  .close-btn {
-    position:absolute;
-    right: 16px;
-    top: 16px;
-    background:rgba(255,255,255,0.12);
-    border:none;
-    padding: 8px;
-    border-radius: 10px;
-    color:var(--white);
-    cursor:pointer;
-    font-weight:700;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-body {
-    display:flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-  }
-
-  /* left: big receipt details */
-  .receipt-card {
-    background: linear-gradient(180deg, rgba(0,112,168,0.03), rgba(127,209,255,0.02));
-    border-radius:12px;
-    padding: 16px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-  }
-
-  .receipt-card .top {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .receipt-card .top .left {
-    display:flex;
-    gap: 10px;
-    align-items:center;
-  }
-
-  .receipt-card .top .left .badge {
-    width: 56px;
-    height: 56px;
-    border-radius: 10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:900;
-    background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
-    color:var(--white);
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-
-  .player-info {
-    min-width: 0;
-  }
-
-  .player-name {
-    font-weight:800;
-    font-size: 14px;
-    color: var(--ocean-900);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .player-date {
-    color:var(--muted);
-    font-size: 12px;
-    margin-top: 4px;
-  }
-
-  .receipt-grid {
-    display:grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    color:var(--ocean-900);
-  }
-
-  .field {
-    background:var(--white);
-    border-radius: 10px;
-    padding: 12px;
-    border:1px solid rgba(0,0,0,0.04);
-    box-shadow: var(--shadow-md);
-  }
-
-  .field .label {
-    font-size: 11px;
-    color:var(--muted);
-    font-weight:700;
-  }
-
-  .field .value {
-    margin-top: 6px;
-    font-weight:800;
-    font-size: 14px;
-    color:var(--ocean-900);
-    word-break: break-all;
-  }
-
-  .receipt-card .notes {
-    margin-top: 14px;
-    font-size: 12px;
-    color:var(--muted);
-    line-height: 1.4;
-  }
-
-  /* right column: side details like OPAY receipt style listing */
-  .side {
-    border-radius:12px;
-    padding: 14px;
-    background:var(--white);
-    border:1px solid rgba(0,0,0,0.04);
-    box-shadow: var(--shadow-md);
-    display:flex;
-    flex-direction:column;
-    gap: 10px;
-  }
-
-  .side .row {
-    display:flex;
-    justify-content:space-between;
-    gap: 8px;
-    align-items:center;
-    padding: 8px 4px;
-    border-bottom: 1px solid rgba(0,0,0,0.04);
-  }
-
-  .side .row:last-child {
-    border-bottom: none;
-  }
-
-  .side .row .k {
-    color:var(--muted);
-    font-weight:700;
-    font-size: 12px;
-    flex-shrink: 0;
-  }
-
-  .side .row .v {
-    font-weight:800;
-    text-align:right;
-    font-size: 13px;
-    word-break: break-all;
-    margin-left: 8px;
-  }
-
-  .side .cta {
-    margin-top: 8px;
-    display:flex;
-    gap: 8px;
-  }
-
-  .btn {
-    flex:1;
-    border-radius: 10px;
-    padding: 12px 14px;
-    border:0;
-    font-weight:800;
-    cursor:pointer;
-    font-size: 14px;
-  }
-
-  .btn.primary {
-    background: linear-gradient(90deg,var(--ocean-700), var(--ocean-500));
-    color:var(--white);
-    box-shadow: 0 6px 20px rgba(0,112,168,0.2);
-  }
-
-  .btn.ghost {
-    background:transparent;
-    border:1px solid rgba(0,0,0,0.06);
-    color:var(--ocean-900);
-  }
-
-  /* Tablet and desktop */
-  @media (min-width: 768px) {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Transaction History — Dewdrop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <style>
+    :root{
+      --ocean-900: #003f63;
+      --ocean-700: #0072a8;
+      --ocean-500: #00a0ff;
+      --ocean-300: #7fd1ff;
+      --white: #ffffff;
+      --muted: #6b7280;
+      --glass: rgba(255,255,255,0.08);
+      --card-radius: 12px;
+      --shadow-lg: 0 10px 30px rgba(3,10,34,0.25);
+      --shadow-md: 0 6px 18px rgba(3,10,34,0.12);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      padding:0;
+      background: linear-gradient(180deg, #eaf8ff 0%, #f7fbff 100%);
+      color: #0b1220;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Page container - MOBILE FIRST */
     .page {
-      max-width: 800px;
-      padding: 24px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px;
+      box-sizing: border-box;
+      min-height: 100vh;
     }
 
-    header {
-      flex-wrap: nowrap;
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
+    .brand {
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: var(--shadow-md);
+      color:var(--white);
+      font-weight:800;
+      font-size: 16px;
+      letter-spacing:0.6px;
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    h1 {
+      margin:0;
+      font-size: 18px;
+      font-weight:700;
+      color:var(--ocean-900);
+      line-height: 1.2;
+    }
+
+    .sub {
+      color:var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    /* Controls */
     .controls {
-      width: auto;
-      margin-top: 0;
-      order: 0;
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      width: 100%;
+      margin-top: 12px;
+      order: 3;
     }
 
     .search {
-      min-width: 200px;
+      background:var(--white);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow-md);
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      flex: 1;
+      min-width: 0;
     }
 
-    .receipt-grid {
-      grid-template-columns: repeat(2, 1fr);
+    .search input{
+      border:0;
+      outline:none;
+      font-size: 14px;
+      width: 100%;
+      background: transparent;
     }
 
-    .modal-body {
-      flex-direction: row;
+    .filter-btn{
+      background:var(--white);
+      border:1px solid rgba(0,0,0,0.06);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow:var(--shadow-md);
+      font-size: 13px;
+      white-space: nowrap;
     }
 
-    .receipt-card {
+    .filter-btn.active {
+      background: linear-gradient(90deg,var(--ocean-700), var(--ocean-500));
+      color: var(--white);
+    }
+
+    /* List container */
+    .list {
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .loading-spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--ocean-300);
+      border-top: 2px solid var(--ocean-700);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* Receipt row (horizontal) */
+    .receipt {
+      background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+      border-radius: var(--card-radius);
+      padding: 14px;
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      cursor:pointer;
+      border-left: 4px solid transparent;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .receipt.win {
+      border-left-color: #0a8f3c;
+    }
+
+    .receipt.lose {
+      border-left-color: #d63d3d;
+    }
+
+    .receipt:hover{
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .receipt .left {
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 0;
       flex: 1;
     }
 
-    .side {
-      width: 300px;
+    .game-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
+      color:var(--white);
+      font-weight:800;
+      font-size: 12px;
+      box-shadow: 0 4px 12px rgba(0,112,168,0.25);
+      flex-shrink:0;
+    }
+
+    .meta {
+      display:flex;
+      flex-direction:column;
+      gap: 4px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .meta .title {
+      font-weight:700;
+      color:var(--ocean-900);
+      letter-spacing:0.4px;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .meta .small {
+      font-size: 12px;
+      color:var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .middle {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
       flex-shrink: 0;
     }
-  }
 
-  /* Large desktop */
-  @media (min-width: 1024px) {
-    .page {
-      max-width: 1100px;
+    .tag {
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(0,160,255,0.07), rgba(0,112,168,0.04));
+      color:var(--ocean-700);
+      font-weight:600;
+      border:1px solid rgba(0,112,168,0.06);
+      white-space: nowrap;
     }
-  }
-</style>
+
+    .amount {
+      font-weight:800;
+      font-size: 16px;
+      white-space: nowrap;
+    }
+
+    .amount.plus{
+      color: #0a8f3c;
+    }
+
+    .amount.minus{
+      color: #d63d3d;
+    }
+
+    /* small note */
+    .note {
+      display:block;
+      color:var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    /* Modal (pop-out) */
+    .overlay {
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(3,10,34,0.45);
+      backdrop-filter: blur(4px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .22s ease;
+      z-index:60;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .overlay.open{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 500px;
+      max-height:90vh;
+      overflow:auto;
+      border-radius:16px;
+      background: linear-gradient(180deg, var(--white), #fbfeff);
+      box-shadow: 0 20px 50px rgba(3,10,34,0.45);
+      transform: translateY(10px) scale(.99);
+      transition: transform .28s cubic-bezier(.2,.9,.3,1);
+      position:relative;
+      border:1px solid rgba(0,0,0,0.04);
+    }
+
+    .overlay.open .modal{
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, var(--ocean-700), var(--ocean-500));
+      padding: 20px 20px 16px 20px;
+      border-top-left-radius:16px;
+      border-top-right-radius:16px;
+      color:var(--white);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .modal-header .center-title{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex-direction:column;
+      text-align:center;
+    }
+
+    .modal-header .game-big {
+      font-size: 18px;
+      font-weight:800;
+      letter-spacing:0.8px;
+    }
+
+    .modal-header .sub-title {
+      font-size: 12px;
+      opacity:0.95;
+      font-weight:600;
+    }
+
+    .close-btn {
+      position:absolute;
+      right: 16px;
+      top: 16px;
+      background:rgba(255,255,255,0.12);
+      border:none;
+      padding: 8px;
+      border-radius: 10px;
+      color:var(--white);
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-body {
+      display:flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    /* left: big receipt details */
+    .receipt-card {
+      background: linear-gradient(180deg, rgba(0,112,168,0.03), rgba(127,209,255,0.02));
+      border-radius:12px;
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+
+    .receipt-card .top {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .receipt-card .top .left {
+      display:flex;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .receipt-card .top .left .badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      background: linear-gradient(135deg,var(--ocean-700),var(--ocean-500));
+      color:var(--white);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .player-info {
+      min-width: 0;
+    }
+
+    .player-name {
+      font-weight:800;
+      font-size: 14px;
+      color: var(--ocean-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-date {
+      color:var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .receipt-grid {
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      color:var(--ocean-900);
+    }
+
+    .field {
+      background:var(--white);
+      border-radius: 10px;
+      padding: 12px;
+      border:1px solid rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-md);
+    }
+
+    .field .label {
+      font-size: 11px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .field .value {
+      margin-top: 6px;
+      font-weight:800;
+      font-size: 14px;
+      color:var(--ocean-900);
+      word-break: break-all;
+    }
+
+    .receipt-card .notes {
+      margin-top: 14px;
+      font-size: 12px;
+      color:var(--muted);
+      line-height: 1.4;
+    }
+
+    /* right column: side details like OPAY receipt style listing */
+    .side {
+      border-radius:12px;
+      padding: 14px;
+      background:var(--white);
+      border:1px solid rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-md);
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    .side .row {
+      display:flex;
+      justify-content:space-between;
+      gap: 8px;
+      align-items:center;
+      padding: 8px 4px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .side .row:last-child {
+      border-bottom: none;
+    }
+
+    .side .row .k {
+      color:var(--muted);
+      font-weight:700;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .side .row .v {
+      font-weight:800;
+      text-align:right;
+      font-size: 13px;
+      word-break: break-all;
+      margin-left: 8px;
+    }
+
+    .side .cta {
+      margin-top: 8px;
+      display:flex;
+      gap: 8px;
+    }
+
+    .btn {
+      flex:1;
+      border-radius: 10px;
+      padding: 12px 14px;
+      border:0;
+      font-weight:800;
+      cursor:pointer;
+      font-size: 14px;
+    }
+
+    .btn.primary {
+      background: linear-gradient(90deg,var(--ocean-700), var(--ocean-500));
+      color:var(--white);
+      box-shadow: 0 6px 20px rgba(0,112,168,0.2);
+    }
+
+    .btn.ghost {
+      background:transparent;
+      border:1px solid rgba(0,0,0,0.06);
+      color:var(--ocean-900);
+    }
+
+    /* Words Modal */
+    .words-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 70;
+      background: rgba(3,10,34,0.45);
+      backdrop-filter: blur(4px);
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .words-modal.open {
+      display: grid;
+    }
+
+    .words-container {
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 16px;
+      background: linear-gradient(180deg, var(--white), #fbfeff);
+      box-shadow: 0 20px 50px rgba(3,10,34,0.45);
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .words-header {
+      background: linear-gradient(135deg, var(--ocean-700), var(--ocean-500));
+      padding: 20px 20px 16px 20px;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .words-header .center-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .words-header .game-big {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+    }
+
+    .words-header .sub-title {
+      font-size: 12px;
+      opacity: 0.95;
+      font-weight: 600;
+    }
+
+    .words-close-btn {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      background: rgba(255,255,255,0.12);
+      border: none;
+      padding: 8px;
+      border-radius: 10px;
+      color: var(--white);
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .words-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .words-section {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .words-section h3 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ocean-900);
+    }
+
+    .word-bag-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .letter-chip {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--ocean-700), var(--ocean-500));
+      color: var(--white);
+      font-weight: 900;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .words-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .word-badge {
+      padding: 8px 12px;
+      background: rgba(0,160,255,0.1);
+      border: 1px solid rgba(0,160,255,0.2);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .word-badge.valid {
+      background: rgba(10, 143, 60, 0.1);
+      border-color: rgba(10, 143, 60, 0.3);
+    }
+
+    .word-badge.invalid {
+      background: rgba(214, 61, 61, 0.1);
+      border-color: rgba(214, 61, 61, 0.3);
+    }
+
+    /* Tablet and desktop */
+    @media (min-width: 768px) {
+      .page {
+        max-width: 800px;
+        padding: 24px;
+      }
+
+      header {
+        flex-wrap: nowrap;
+      }
+
+      .controls {
+        width: auto;
+        margin-top: 0;
+        order: 0;
+      }
+
+      .search {
+        min-width: 200px;
+      }
+
+      .receipt-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .modal-body {
+        flex-direction: row;
+      }
+
+      .receipt-card {
+        flex: 1;
+      }
+
+      .side {
+        width: 300px;
+        flex-shrink: 0;
+      }
+    }
+
+    /* Large desktop */
+    @media (min-width: 1024px) {
+      .page {
+        max-width: 1100px;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -700,6 +848,11 @@
         <div class="notes">
           <strong>Notes:</strong> This is a generated receipt. Always keep your transaction reference for future queries.
         </div>
+        
+        <!-- Words Button -->
+        <div style="margin-top: 16px;">
+          <button class="btn primary" id="viewWordsBtn" style="width: 100%;">View Words & Word Bag</button>
+        </div>
       </div>
 
       <aside class="side">
@@ -717,6 +870,39 @@
           <button class="btn primary" id="downloadBtn">Download</button>
         </div>
       </aside>
+    </div>
+  </div>
+</div>
+
+<!-- Words Modal -->
+<div class="words-modal" id="wordsModal">
+  <div class="words-container">
+    <div class="words-header">
+      <button class="words-close-btn" id="wordsCloseBtn" title="Close">✕</button>
+      <div class="center-title">
+        <div class="game-big">DEWDROP</div>
+        <div class="sub-title">Word Bag & Words Played</div>
+      </div>
+    </div>
+    <div class="words-body">
+      <div class="words-section">
+        <h3>Word Bag</h3>
+        <div class="word-bag-display" id="wordBagDisplay">
+          <!-- Word bag letters will be inserted here -->
+        </div>
+      </div>
+      <div class="words-section">
+        <h3>Words Played</h3>
+        <div class="words-list" id="wordsPlayedList">
+          <!-- Words played will be inserted here -->
+        </div>
+      </div>
+      <div class="words-section">
+        <h3>Valid Words</h3>
+        <div class="words-list" id="validWordsList">
+          <!-- Valid words will be inserted here -->
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -740,9 +926,11 @@
 
   let currentUser = null;
   let transactionData = [];
+  let currentSelectedItem = null;
 
   const listEl = document.getElementById('list');
   const overlay = document.getElementById('overlay');
+  const wordsModal = document.getElementById('wordsModal');
 
   // Format currency
   function formatCurrency(n){
@@ -778,19 +966,32 @@
       const transactions = [];
       snapshot.forEach(doc => {
         const data = doc.data();
+        
+        // Extract the user name correctly
+        let playerName = currentUser.displayName || currentUser.email || 'Unknown Player';
+        
+        // Extract game name correctly
+        let gameName = 'Dewdrop Challenge';
+        
+        // Extract words played and word bag
+        const wordsPlayed = data.words || [];
+        const wordBag = data.wordBag || [];
+        const validWords = data.validWords || [];
+        
         transactions.push({
-          id: data.betId || doc.id,
-          game: data.gameSession || 'Unknown Game',
-          player: data.userName || currentUser.displayName || currentUser.email,
+          id: doc.id,
+          game: gameName,
+          player: playerName,
           bet: data.betAmount || 0,
-          reward: data.reward || (data.amountWonLost > 0 ? data.amountWonLost : 0),
-          amount: data.amountWonLost || 0,
+          reward: data.result >= 0 ? data.result : 0,
+          amount: data.result || 0,
           date: data.date || new Date().toISOString(),
-          status: data.status || (data.amountWonLost >= 0 ? 'WIN' : 'LOSE'),
-          balanceAfter: data.finalBalance || 0,
-          ref: data.ref || data.betId || doc.id,
-          wordsPlayed: data.wordsPlayed || [],
-          wordBag: data.wordBag || []
+          status: data.result >= 0 ? 'WIN' : 'LOSE',
+          balanceAfter: data.balance || 0,
+          ref: doc.id,
+          wordsPlayed: wordsPlayed,
+          wordBag: wordBag,
+          validWords: validWords
         });
       });
 
@@ -925,7 +1126,14 @@
   const sBal = document.getElementById('sBal');
   const sRef = document.getElementById('sRef');
 
+  const viewWordsBtn = document.getElementById('viewWordsBtn');
+  const wordBagDisplay = document.getElementById('wordBagDisplay');
+  const wordsPlayedList = document.getElementById('wordsPlayedList');
+  const validWordsList = document.getElementById('validWordsList');
+
   function openModal(item){
+    currentSelectedItem = item;
+    
     modalGame.textContent = item.game;
     modalSub.textContent = 'Detailed Receipt';
     modalBadge.textContent = item.game.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
@@ -954,15 +1162,75 @@
     document.getElementById('closeBtn').focus();
   }
 
+  function openWordsModal() {
+    if (!currentSelectedItem) return;
+    
+    // Clear previous content
+    wordBagDisplay.innerHTML = '';
+    wordsPlayedList.innerHTML = '';
+    validWordsList.innerHTML = '';
+    
+    // Display word bag
+    if (currentSelectedItem.wordBag && currentSelectedItem.wordBag.length > 0) {
+      currentSelectedItem.wordBag.forEach(letter => {
+        const chip = document.createElement('div');
+        chip.className = 'letter-chip';
+        chip.textContent = letter.toUpperCase();
+        wordBagDisplay.appendChild(chip);
+      });
+    } else {
+      wordBagDisplay.innerHTML = '<div style="color: var(--muted); font-style: italic;">No word bag data available</div>';
+    }
+    
+    // Display words played
+    if (currentSelectedItem.wordsPlayed && currentSelectedItem.wordsPlayed.length > 0) {
+      currentSelectedItem.wordsPlayed.forEach(word => {
+        const badge = document.createElement('div');
+        const isValid = currentSelectedItem.validWords && currentSelectedItem.validWords.includes(word);
+        badge.className = `word-badge ${isValid ? 'valid' : 'invalid'}`;
+        badge.textContent = word.toUpperCase();
+        wordsPlayedList.appendChild(badge);
+      });
+    } else {
+      wordsPlayedList.innerHTML = '<div style="color: var(--muted); font-style: italic;">No words played data available</div>';
+    }
+    
+    // Display valid words
+    if (currentSelectedItem.validWords && currentSelectedItem.validWords.length > 0) {
+      currentSelectedItem.validWords.forEach(word => {
+        const badge = document.createElement('div');
+        badge.className = 'word-badge valid';
+        badge.textContent = word.toUpperCase();
+        validWordsList.appendChild(badge);
+      });
+    } else {
+      validWordsList.innerHTML = '<div style="color: var(--muted); font-style: italic;">No valid words data available</div>';
+    }
+    
+    wordsModal.classList.add('open');
+  }
+
+  function closeModal(){
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden','true');
+    currentSelectedItem = null;
+  }
+
+  function closeWordsModal() {
+    wordsModal.classList.remove('open');
+  }
+
   document.getElementById('closeBtn').addEventListener('click', closeModal);
   overlay.addEventListener('click', (ev) => {
     if(ev.target === overlay) closeModal();
   });
 
-  function closeModal(){
-    overlay.classList.remove('open');
-    overlay.setAttribute('aria-hidden','true');
-  }
+  document.getElementById('wordsCloseBtn').addEventListener('click', closeWordsModal);
+  wordsModal.addEventListener('click', (ev) => {
+    if(ev.target === wordsModal) closeWordsModal();
+  });
+
+  viewWordsBtn.addEventListener('click', openWordsModal);
 
   // Search & filters
   const searchInput = document.getElementById('search');
@@ -1043,6 +1311,7 @@
   // Keyboard navigation
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+    if(e.key === 'Escape' && wordsModal.classList.contains('open')) closeWordsModal();
   });
 
   // Make receipt elements focusable for keyboard
