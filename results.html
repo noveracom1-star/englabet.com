@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Transaction History — Dewdrop</title>
+  <title>Game History — EnglaBet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <!-- Firebase SDK -->
@@ -147,6 +147,32 @@
       color: var(--white);
     }
 
+    /* Game type tabs */
+    .game-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      padding-bottom: 8px;
+    }
+
+    .tab {
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--muted);
+      transition: all 0.2s ease;
+    }
+
+    .tab.active {
+      background: var(--ocean-500);
+      color: var(--white);
+    }
+
     /* List container */
     .list {
       display:flex;
@@ -213,6 +239,10 @@
 
     .receipt.lose {
       border-left-color: #d63d3d;
+    }
+
+    .receipt.partial {
+      border-left-color: #f59e0b;
     }
 
     .receipt:hover{
@@ -836,6 +866,45 @@
       border-color: rgba(214, 61, 61, 0.3);
     }
 
+    /* Letter analysis display */
+    .letter-analysis {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .letter-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .letter-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .letter-circle.correct {
+      background: rgba(10, 143, 60, 0.2);
+      color: #0a8f3c;
+      border: 2px solid rgba(10, 143, 60, 0.4);
+    }
+
+    .letter-circle.incorrect {
+      background: rgba(214, 61, 61, 0.2);
+      color: #d63d3d;
+      border: 2px solid rgba(214, 61, 61, 0.4);
+    }
+
     /* Tablet and desktop */
     @media (min-width: 768px) {
       .page {
@@ -871,9 +940,9 @@
 <div class="page">
   <header>
     <div class="brand">
-      <div class="logo">DD</div>
+      <div class="logo">EB</div>
       <div class="brand-text">
-        <h1>Transaction History</h1>
+        <h1>Game History</h1>
         <div class="sub">Recent game results & receipts</div>
       </div>
     </div>
@@ -881,19 +950,25 @@
     <div class="controls">
       <div class="search" aria-hidden="false">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="#0b1220" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#0b1220" stroke-width="2"/></svg>
-        <input id="search" placeholder="Search by name, game, ref..." />
+        <input id="search" placeholder="Search by name, word, level..." />
       </div>
       <button class="filter-btn active" id="filterAll">All</button>
-      <button class="filter-btn" id="filterWin">Rewards</button>
-      <button class="filter-btn" id="filterBet">Bet</button>
+      <button class="filter-btn" id="filterWin">Won</button>
+      <button class="filter-btn" id="filterPartial">Partial</button>
+      <button class="filter-btn" id="filterLost">Lost</button>
     </div>
   </header>
+
+  <div class="game-tabs">
+    <button class="tab active" id="tabVirtualSpelling">Virtual Spelling</button>
+    <button class="tab" id="tabTransactionHistory">WordBet</button>
+  </div>
 
   <main>
     <div class="list" id="list">
       <div class="loading">
         <div class="loading-spinner"></div>
-        <div>Loading transactions...</div>
+        <div>Loading game history...</div>
       </div>
     </div>
   </main>
@@ -905,8 +980,8 @@
     <div class="modal-header">
       <button class="close-btn" id="closeBtn" title="Close">✕</button>
       <div class="center-title">
-        <div class="game-big" id="modalGame">DEWDROP</div>
-        <div class="sub-title" id="modalSub">Transaction receipt</div>
+        <div class="game-big" id="modalGame">VIRTUAL SPELLING</div>
+        <div class="sub-title" id="modalSub">Game receipt</div>
       </div>
     </div>
 
@@ -914,7 +989,7 @@
       <div class="receipt-simple">
         <div class="header">
           <div class="left">
-            <div class="badge" id="modalBadge">DD</div>
+            <div class="badge" id="modalBadge">VS</div>
             <div class="player-info">
               <div class="player-name" id="modalPlayer">Player — JOHN DOE</div>
               <div class="player-date" id="modalDate">May 1, 2025 — 12:34 PM</div>
@@ -934,7 +1009,7 @@
           </div>
           <div class="detail-row">
             <div class="label">Game</div>
-            <div class="value" id="sGame">DEWDROP</div>
+            <div class="value" id="sGame">Virtual Spelling</div>
           </div>
           <div class="detail-row">
             <div class="label">Player</div>
@@ -945,21 +1020,33 @@
             <div class="value" id="sBet">₦0</div>
           </div>
           <div class="detail-row">
-            <div class="label">Reward</div>
+            <div class="label">Winnings</div>
             <div class="value" id="sReward">₦0</div>
           </div>
           <div class="detail-row">
-            <div class="label">Balance After</div>
-            <div class="value" id="sBal">₦0</div>
+            <div class="label">Target Word</div>
+            <div class="value" id="sTargetWord">—</div>
           </div>
           <div class="detail-row">
-            <div class="label">Ref</div>
-            <div class="value" id="sRef">—</div>
+            <div class="label">Player Word</div>
+            <div class="value" id="sPlayerWord">—</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Correct Letters</div>
+            <div class="value" id="sCorrectLetters">0/0</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Time Used</div>
+            <div class="value" id="sTimeUsed">0s</div>
+          </div>
+          <div class="detail-row">
+            <div class="label">Level</div>
+            <div class="value" id="sLevel">—</div>
           </div>
         </div>
 
         <div class="actions">
-          <button class="btn primary" id="viewWordsBtn">View Words & Word Bag</button>
+          <button class="btn primary" id="viewWordsBtn">View Letter Analysis</button>
         </div>
         
         <div class="actions">
@@ -977,7 +1064,7 @@
     <div class="download-header">
       <button class="download-close-btn" id="downloadCloseBtn" title="Close">✕</button>
       <div class="center-title">
-        <div class="game-big">DEWDROP</div>
+        <div class="game-big">VIRTUAL SPELLING</div>
         <div class="sub-title">Download Receipt</div>
       </div>
     </div>
@@ -1008,27 +1095,27 @@
     <div class="words-header">
       <button class="words-close-btn" id="wordsCloseBtn" title="Close">✕</button>
       <div class="center-title">
-        <div class="game-big">DEWDROP</div>
-        <div class="sub-title">Word Bag & Words Played</div>
+        <div class="game-big">VIRTUAL SPELLING</div>
+        <div class="sub-title">Letter Analysis</div>
       </div>
     </div>
     <div class="words-body">
       <div class="words-section">
-        <h3>Word Bag</h3>
-        <div class="word-bag-display" id="wordBagDisplay">
-          <!-- Word bag letters will be inserted here -->
+        <h3>Target Word</h3>
+        <div class="word-bag-display" id="targetWordDisplay">
+          <!-- Target word letters will be inserted here -->
         </div>
       </div>
       <div class="words-section">
-        <h3>Words Played</h3>
-        <div class="words-list" id="wordsPlayedList">
-          <!-- Words played will be inserted here -->
+        <h3>Player Word</h3>
+        <div class="word-bag-display" id="playerWordDisplay">
+          <!-- Player word letters will be inserted here -->
         </div>
       </div>
       <div class="words-section">
-        <h3>Valid Words</h3>
-        <div class="words-list" id="validWordsList">
-          <!-- Valid words will be inserted here -->
+        <h3>Letter Analysis</h3>
+        <div class="letter-analysis" id="letterAnalysisDisplay">
+          <!-- Letter analysis will be inserted here -->
         </div>
       </div>
     </div>
@@ -1053,13 +1140,17 @@
   const auth = firebase.auth();
 
   let currentUser = null;
+  let virtualSpellingData = [];
   let transactionData = [];
   let currentSelectedItem = null;
+  let currentGameType = 'virtualSpelling'; // Default to Virtual Spelling
 
   const listEl = document.getElementById('list');
   const overlay = document.getElementById('overlay');
   const wordsModal = document.getElementById('wordsModal');
   const downloadModal = document.getElementById('downloadModal');
+  const tabVirtualSpelling = document.getElementById('tabVirtualSpelling');
+  const tabTransactionHistory = document.getElementById('tabTransactionHistory');
 
   // Format currency
   function formatCurrency(n){
@@ -1077,6 +1168,56 @@
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  // Load Virtual Spelling games from Firestore
+  async function loadVirtualSpellingGames() {
+    try {
+      if (!currentUser) {
+        throw new Error("No user logged in");
+      }
+
+      const snapshot = await db.collection('users').doc(currentUser.uid)
+        .collection('game_history')
+        .orderBy('timestamp', 'desc')
+        .limit(50)
+        .get();
+
+      const games = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        
+        // Map Virtual Spelling Firestore fields to our game structure
+        const betAmount = data.betAmount || 0;
+        const winnings = data.winnings || 0;
+        const netAmount = winnings - betAmount;
+        
+        games.push({
+          id: doc.id,
+          game: 'Virtual Spelling',
+          player: data.userName || 'Unknown Player',
+          bet: betAmount,
+          reward: winnings,
+          amount: netAmount,
+          date: data.date || (data.timestamp ? data.timestamp.toDate().toISOString() : new Date().toISOString()),
+          status: data.resultStatus || 'UNKNOWN',
+          balanceAfter: 0, // This would need to be calculated or stored separately
+          ref: doc.id,
+          targetWord: data.targetWord || '',
+          playerWord: data.playerWord || '',
+          correctLetters: data.correctLetters || 0,
+          totalLetters: data.totalLetters || 0,
+          timeUsed: data.timeUsed || 0,
+          level: data.level || 0,
+          letterAnalysis: data.letterAnalysis || []
+        });
+      });
+
+      return games;
+    } catch (error) {
+      console.error("Error loading Virtual Spelling games:", error);
+      throw error;
+    }
   }
 
   // Load transactions from Firestore
@@ -1124,8 +1265,72 @@
     }
   }
 
+  // Create Virtual Spelling game row
+  function createVirtualSpellingRow(item){
+    const r = document.createElement('div');
+    
+    // Determine status class
+    let statusClass = '';
+    if (item.status === 'won') {
+      statusClass = 'win';
+    } else if (item.status === 'partial') {
+      statusClass = 'partial';
+    } else {
+      statusClass = 'lose';
+    }
+    
+    r.className = `receipt ${statusClass}`;
+    r.dataset.id = item.id;
+
+    // left
+    const left = document.createElement('div');
+    left.className = 'left';
+    const badge = document.createElement('div');
+    badge.className = 'game-badge';
+    badge.textContent = 'VS';
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = item.player.toUpperCase();
+    const small = document.createElement('div');
+    small.className = 'small';
+    small.textContent = `Level ${item.level} • ${item.targetWord} • ${formatDate(item.date).split(' — ')[0]}`;
+
+    meta.appendChild(title);
+    meta.appendChild(small);
+    left.appendChild(badge);
+    left.appendChild(meta);
+
+    // middle
+    const middle = document.createElement('div');
+    middle.className = 'middle';
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.textContent = item.status.toUpperCase();
+    const note = document.createElement('div');
+    note.className = 'note';
+    note.textContent = `${item.correctLetters}/${item.totalLetters} letters`;
+
+    middle.appendChild(tag);
+    middle.appendChild(note);
+
+    // amount
+    const amount = document.createElement('div');
+    amount.className = 'amount ' + (item.amount >= 0 ? 'plus' : 'minus');
+    amount.textContent = (item.amount >= 0 ? '+' : '') + formatCurrency(item.amount);
+
+    r.appendChild(left);
+    r.appendChild(middle);
+    r.appendChild(amount);
+
+    r.addEventListener('click', () => openModal(item));
+    return r;
+  }
+
   // Create transaction row
-  function createRow(item){
+  function createTransactionRow(item){
     const r = document.createElement('div');
     r.className = `receipt ${item.status === 'WIN' ? 'win' : 'lose'}`;
     r.dataset.id = item.id;
@@ -1177,9 +1382,20 @@
     return r;
   }
 
-  // Render transaction list
-  function renderList(items){
+  // Render game list based on current game type
+  function renderList(){
     listEl.innerHTML = '';
+    
+    let items = [];
+    let emptyMessage = '';
+    
+    if (currentGameType === 'virtualSpelling') {
+      items = virtualSpellingData;
+      emptyMessage = 'No Virtual Spelling games found';
+    } else {
+      items = transactionData;
+      emptyMessage = 'No transactions found';
+    }
     
     if (items.length === 0) {
       listEl.innerHTML = `
@@ -1188,15 +1404,19 @@
             <path d="M19 5V19H5V5H19ZM19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z" fill="currentColor"/>
             <path d="M14 17H7V15H14V17ZM17 13H7V11H17V13ZM17 9H7V7H17V9Z" fill="currentColor"/>
           </svg>
-          <div>No transactions found</div>
-          <div style="font-size: 12px; margin-top: 8px;">Your transaction history will appear here</div>
+          <div>${emptyMessage}</div>
+          <div style="font-size: 12px; margin-top: 8px;">Your ${currentGameType === 'virtualSpelling' ? 'game history' : 'transaction history'} will appear here</div>
         </div>
       `;
       return;
     }
 
     for(const it of items){
-      listEl.appendChild(createRow(it));
+      if (currentGameType === 'virtualSpelling') {
+        listEl.appendChild(createVirtualSpellingRow(it));
+      } else {
+        listEl.appendChild(createTransactionRow(it));
+      }
     }
   }
 
@@ -1205,7 +1425,7 @@
     listEl.innerHTML = `
       <div class="loading">
         <div class="loading-spinner"></div>
-        <div>Loading transactions...</div>
+        <div>Loading ${currentGameType === 'virtualSpelling' ? 'Virtual Spelling games' : 'transactions'}...</div>
       </div>
     `;
   }
@@ -1217,7 +1437,7 @@
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
         </svg>
-        <div>Unable to load transactions</div>
+        <div>Unable to load ${currentGameType === 'virtualSpelling' ? 'games' : 'transactions'}</div>
         <div style="font-size: 12px; margin-top: 8px;">${message}</div>
         <button class="filter-btn" onclick="initializeApp()" style="margin-top: 12px;">Try Again</button>
       </div>
@@ -1238,33 +1458,69 @@
   const sPlayer = document.getElementById('sPlayer');
   const sBet = document.getElementById('sBet');
   const sReward = document.getElementById('sReward');
-  const sBal = document.getElementById('sBal');
-  const sRef = document.getElementById('sRef');
+  const sTargetWord = document.getElementById('sTargetWord');
+  const sPlayerWord = document.getElementById('sPlayerWord');
+  const sCorrectLetters = document.getElementById('sCorrectLetters');
+  const sTimeUsed = document.getElementById('sTimeUsed');
+  const sLevel = document.getElementById('sLevel');
 
   const viewWordsBtn = document.getElementById('viewWordsBtn');
-  const wordBagDisplay = document.getElementById('wordBagDisplay');
-  const wordsPlayedList = document.getElementById('wordsPlayedList');
-  const validWordsList = document.getElementById('validWordsList');
+  const targetWordDisplay = document.getElementById('targetWordDisplay');
+  const playerWordDisplay = document.getElementById('playerWordDisplay');
+  const letterAnalysisDisplay = document.getElementById('letterAnalysisDisplay');
 
   function openModal(item){
     currentSelectedItem = item;
     
-    modalGame.textContent = item.game;
-    modalSub.textContent = 'Detailed Receipt';
-    modalBadge.textContent = item.game.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
-    modalPlayer.textContent = 'Player — ' + item.player.toUpperCase();
-    modalDate.textContent = formatDate(item.date);
-    modalAmount.textContent = (item.amount >= 0 ? '+' : '') + formatCurrency(item.amount);
-    modalAmount.className = 'amount ' + (item.amount >= 0 ? 'plus' : 'minus');
+    if (currentGameType === 'virtualSpelling') {
+      // Virtual Spelling modal
+      modalGame.textContent = 'VIRTUAL SPELLING';
+      modalSub.textContent = 'Game Receipt';
+      modalBadge.textContent = 'VS';
+      modalPlayer.textContent = 'Player — ' + item.player.toUpperCase();
+      modalDate.textContent = formatDate(item.date);
+      modalAmount.textContent = (item.amount >= 0 ? '+' : '') + formatCurrency(item.amount);
+      modalAmount.className = 'amount ' + (item.amount >= 0 ? 'plus' : 'minus');
 
-    sStatus.textContent = item.status;
-    sDate.textContent = formatDate(item.date);
-    sGame.textContent = item.game;
-    sPlayer.textContent = item.player;
-    sBet.textContent = formatCurrency(item.bet);
-    sReward.textContent = formatCurrency(item.reward);
-    sBal.textContent = formatCurrency(item.balanceAfter);
-    sRef.textContent = item.ref;
+      sStatus.textContent = item.status.toUpperCase();
+      sDate.textContent = formatDate(item.date);
+      sGame.textContent = 'Virtual Spelling';
+      sPlayer.textContent = item.player;
+      sBet.textContent = formatCurrency(item.bet);
+      sReward.textContent = formatCurrency(item.reward);
+      sTargetWord.textContent = item.targetWord || '—';
+      sPlayerWord.textContent = item.playerWord || '—';
+      sCorrectLetters.textContent = `${item.correctLetters}/${item.totalLetters}`;
+      sTimeUsed.textContent = `${item.timeUsed}s`;
+      sLevel.textContent = `Level ${item.level}`;
+
+      // Show the letter analysis button for Virtual Spelling
+      viewWordsBtn.style.display = 'block';
+    } else {
+      // Transaction History modal
+      modalGame.textContent = item.game;
+      modalSub.textContent = 'Transaction Receipt';
+      modalBadge.textContent = item.game.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
+      modalPlayer.textContent = 'Player — ' + item.player.toUpperCase();
+      modalDate.textContent = formatDate(item.date);
+      modalAmount.textContent = (item.amount >= 0 ? '+' : '') + formatCurrency(item.amount);
+      modalAmount.className = 'amount ' + (item.amount >= 0 ? 'plus' : 'minus');
+
+      sStatus.textContent = item.status;
+      sDate.textContent = formatDate(item.date);
+      sGame.textContent = item.game;
+      sPlayer.textContent = item.player;
+      sBet.textContent = formatCurrency(item.bet);
+      sReward.textContent = formatCurrency(item.reward);
+      sTargetWord.textContent = '—';
+      sPlayerWord.textContent = '—';
+      sCorrectLetters.textContent = '—';
+      sTimeUsed.textContent = '—';
+      sLevel.textContent = '—';
+
+      // Hide the letter analysis button for Transaction History
+      viewWordsBtn.style.display = 'none';
+    }
 
     overlay.classList.add('open');
     overlay.setAttribute('aria-hidden','false');
@@ -1272,48 +1528,60 @@
   }
 
   function openWordsModal() {
-    if (!currentSelectedItem) return;
+    if (!currentSelectedItem || currentGameType !== 'virtualSpelling') return;
     
     // Clear previous content
-    wordBagDisplay.innerHTML = '';
-    wordsPlayedList.innerHTML = '';
-    validWordsList.innerHTML = '';
+    targetWordDisplay.innerHTML = '';
+    playerWordDisplay.innerHTML = '';
+    letterAnalysisDisplay.innerHTML = '';
     
-    // Display word bag
-    if (currentSelectedItem.wordBag && currentSelectedItem.wordBag.length > 0) {
-      currentSelectedItem.wordBag.forEach(letter => {
+    // Display target word
+    if (currentSelectedItem.targetWord) {
+      const targetLetters = currentSelectedItem.targetWord.split('');
+      targetLetters.forEach(letter => {
         const chip = document.createElement('div');
         chip.className = 'letter-chip';
         chip.textContent = letter.toUpperCase();
-        wordBagDisplay.appendChild(chip);
+        targetWordDisplay.appendChild(chip);
       });
     } else {
-      wordBagDisplay.innerHTML = '<div style="color: var(--muted); font-style: italic;">No word bag data available</div>';
+      targetWordDisplay.innerHTML = '<div style="color: var(--muted); font-style: italic;">No target word data available</div>';
     }
     
-    // Display words played
-    if (currentSelectedItem.wordsPlayed && currentSelectedItem.wordsPlayed.length > 0) {
-      currentSelectedItem.wordsPlayed.forEach(word => {
-        const badge = document.createElement('div');
-        const isValid = currentSelectedItem.validWords && currentSelectedItem.validWords.includes(word);
-        badge.className = `word-badge ${isValid ? 'valid' : 'invalid'}`;
-        badge.textContent = word.toUpperCase();
-        wordsPlayedList.appendChild(badge);
+    // Display player word
+    if (currentSelectedItem.playerWord) {
+      const playerLetters = currentSelectedItem.playerWord.split('');
+      playerLetters.forEach(letter => {
+        const chip = document.createElement('div');
+        chip.className = 'letter-chip';
+        chip.textContent = letter.toUpperCase();
+        playerWordDisplay.appendChild(chip);
       });
     } else {
-      wordsPlayedList.innerHTML = '<div style="color: var(--muted); font-style: italic;">No words played data available</div>';
+      playerWordDisplay.innerHTML = '<div style="color: var(--muted); font-style: italic;">No player word data available</div>';
     }
     
-    // Display valid words
-    if (currentSelectedItem.validWords && currentSelectedItem.validWords.length > 0) {
-      currentSelectedItem.validWords.forEach(word => {
-        const badge = document.createElement('div');
-        badge.className = 'word-badge valid';
-        badge.textContent = word.toUpperCase();
-        validWordsList.appendChild(badge);
+    // Display letter analysis
+    if (currentSelectedItem.letterAnalysis && currentSelectedItem.letterAnalysis.length > 0) {
+      currentSelectedItem.letterAnalysis.forEach(letterItem => {
+        const letterElement = document.createElement('div');
+        letterElement.className = 'letter-item';
+        
+        const circle = document.createElement('div');
+        circle.className = `letter-circle ${letterItem.correct ? 'correct' : 'incorrect'}`;
+        circle.textContent = letterItem.letter.toUpperCase();
+        
+        const status = document.createElement('div');
+        status.style.fontSize = '10px';
+        status.style.color = letterItem.correct ? '#0a8f3c' : '#d63d3d';
+        status.textContent = letterItem.correct ? '✓' : '✗';
+        
+        letterElement.appendChild(circle);
+        letterElement.appendChild(status);
+        letterAnalysisDisplay.appendChild(letterElement);
       });
     } else {
-      validWordsList.innerHTML = '<div style="color: var(--muted); font-style: italic;">No valid words data available</div>';
+      letterAnalysisDisplay.innerHTML = '<div style="color: var(--muted); font-style: italic;">No letter analysis data available</div>';
     }
     
     wordsModal.classList.add('open');
@@ -1361,7 +1629,7 @@
     const receiptElement = document.querySelector('.receipt-simple');
     const options = {
       margin: 10,
-      filename: `receipt-${currentSelectedItem.ref}.pdf`,
+      filename: `${currentGameType === 'virtualSpelling' ? 'virtual-spelling' : 'transaction'}-${currentSelectedItem.id}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -1383,7 +1651,7 @@
       backgroundColor: '#ffffff'
     }).then(canvas => {
       const link = document.createElement('a');
-      link.download = `receipt-${currentSelectedItem.ref}.png`;
+      link.download = `${currentGameType === 'virtualSpelling' ? 'virtual-spelling' : 'transaction'}-${currentSelectedItem.id}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
       closeDownloadModal();
@@ -1398,23 +1666,46 @@
   const searchInput = document.getElementById('search');
   const filterAll = document.getElementById('filterAll');
   const filterWin = document.getElementById('filterWin');
-  const filterBet = document.getElementById('filterBet');
+  const filterPartial = document.getElementById('filterPartial');
+  const filterLost = document.getElementById('filterLost');
 
   let currentFilter = 'all';
 
   function applyFilter(query='', mode='all'){
     const q = query.trim().toLowerCase();
-    let items = transactionData.filter(it => {
-      if(!q) return true;
-      return it.player.toLowerCase().includes(q) || 
-             it.game.toLowerCase().includes(q) || 
-             it.ref.toLowerCase().includes(q);
-    });
+    let items = [];
+    
+    if (currentGameType === 'virtualSpelling') {
+      items = virtualSpellingData.filter(it => {
+        if(!q) return true;
+        return it.player.toLowerCase().includes(q) || 
+               it.targetWord.toLowerCase().includes(q) || 
+               it.playerWord.toLowerCase().includes(q);
+      });
 
-    if(mode === 'win'){
-      items = items.filter(it => it.amount > 0);
-    } else if(mode === 'bet'){
-      items = items.filter(it => it.amount < 0);
+      if(mode === 'win'){
+        items = items.filter(it => it.status === 'won');
+      } else if(mode === 'partial'){
+        items = items.filter(it => it.status === 'partial');
+      } else if(mode === 'lost'){
+        items = items.filter(it => it.status === 'lost');
+      }
+    } else {
+      items = transactionData.filter(it => {
+        if(!q) return true;
+        return it.player.toLowerCase().includes(q) || 
+               it.game.toLowerCase().includes(q) || 
+               it.ref.toLowerCase().includes(q);
+      });
+
+      if(mode === 'win'){
+        items = items.filter(it => it.amount > 0);
+      } else if(mode === 'partial'){
+        // For transactions, partial might not apply, so we'll use it for small wins
+        items = items.filter(it => it.amount > 0 && it.amount < 100);
+      } else if(mode === 'lost'){
+        items = items.filter(it => it.amount < 0);
+      }
     }
     
     renderList(items);
@@ -1435,7 +1726,36 @@
   searchInput.addEventListener('input', (e) => applyFilter(e.target.value, currentFilter));
   filterAll.addEventListener('click', () => setActiveFilter(filterAll, 'all'));
   filterWin.addEventListener('click', () => setActiveFilter(filterWin, 'win'));
-  filterBet.addEventListener('click', () => setActiveFilter(filterBet, 'bet'));
+  filterPartial.addEventListener('click', () => setActiveFilter(filterPartial, 'partial'));
+  filterLost.addEventListener('click', () => setActiveFilter(filterLost, 'lost'));
+
+  // Game type tabs
+  function setActiveTab(button, gameType) {
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    
+    // Add active class to clicked tab
+    button.classList.add('active');
+    currentGameType = gameType;
+    
+    // Update search placeholder based on game type
+    if (gameType === 'virtualSpelling') {
+      searchInput.placeholder = 'Search by name, word, level...';
+    } else {
+      searchInput.placeholder = 'Search by name, game, ref...';
+    }
+    
+    // Reset filter to "All"
+    setActiveFilter(filterAll, 'all');
+    
+    // Render the appropriate list
+    renderList();
+  }
+
+  tabVirtualSpelling.addEventListener('click', () => setActiveTab(tabVirtualSpelling, 'virtualSpelling'));
+  tabTransactionHistory.addEventListener('click', () => setActiveTab(tabTransactionHistory, 'transactionHistory'));
 
   // Print
   document.getElementById('printBtn').addEventListener('click', () => {
@@ -1476,17 +1796,21 @@
         });
       });
 
-      // Load transactions
-      transactionData = await loadTransactions();
-      renderList(transactionData);
+      // Load both Virtual Spelling games and transactions
+      [virtualSpellingData, transactionData] = await Promise.all([
+        loadVirtualSpellingGames(),
+        loadTransactions()
+      ]);
+      
+      renderList();
       makeFocusable();
       
     } catch (error) {
       console.error("Initialization error:", error);
       if (error.message === "User not authenticated") {
-        showError("Please log in to view your transaction history");
+        showError("Please log in to view your game history");
       } else {
-        showError("Failed to load transactions. Please check your connection.");
+        showError("Failed to load data. Please check your connection.");
       }
     }
   }

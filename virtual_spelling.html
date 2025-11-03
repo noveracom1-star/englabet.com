@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EnglaBet - VirtualSpelling</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <style>
         :root {
             --primary: #0a2e5a;
@@ -1035,6 +1039,7 @@
                 <table class="history-table">
                     <thead>
                         <tr>
+                            <th>Date & Time</th>
                             <th>Word</th>
                             <th>Bet</th>
                             <th>Letters</th>
@@ -1051,6 +1056,22 @@
     </div>
 
     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDivFTAKUznc1xryU8marfMDZG3v1eYsl8",
+            authDomain: "englabet-ad1fe.firebaseapp.com",
+            projectId: "englabet-ad1fe",
+            storageBucket: "englabet-ad1fe.firebasestorage.app",
+            messagingSenderId: "124544822433",
+            appId: "1:124544822433:web:c77c980f28c99364c214e0",
+            measurementId: "G-JMYYM433R7"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
         // Game state
         let currentLevel = 3;
         let gameActive = false;
@@ -1065,6 +1086,7 @@
         let numberToLetterMap = {};
         let currentBetAmount = 0;
         let roundActive = false;
+        let currentUser = null;
 
         // DOM elements
         const timerElement = document.getElementById('timer');
@@ -1090,8 +1112,37 @@
         const recentGamesModal = document.getElementById('recentGamesModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
 
+        // Check authentication state
+        function checkAuthState() {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    // Update user info in the UI
+                    document.querySelector('.user-name').textContent = user.displayName || user.email;
+                    document.querySelector('.user-avatar').textContent = user.displayName ? user.displayName.charAt(0) : user.email.charAt(0);
+                    
+                    // Load user balance from Firestore
+                    try {
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        if (userDoc.exists) {
+                            const userData = userDoc.data();
+                            document.querySelector('.user-balance').textContent = '₦' + (userData.balance || 12500);
+                        }
+                    } catch (error) {
+                        console.error("Error loading user data:", error);
+                    }
+                } else {
+                    // No user is signed in, redirect to login
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+
         // Initialize the game
         function initGame() {
+            // Check authentication
+            checkAuthState();
+            
             // Set up level selection
             levelCards.forEach(card => {
                 card.addEventListener('click', function() {
@@ -1124,6 +1175,7 @@
             // Set up modal functionality
             recentGamesBtn.addEventListener('click', () => {
                 recentGamesModal.style.display = 'flex';
+                loadRecentGames();
             });
 
             closeModalBtn.addEventListener('click', () => {
@@ -1145,6 +1197,116 @@
 
             // Start the round timer
             startRoundTimer();
+        }
+
+        // Load recent games from Firestore
+        async function loadRecentGames() {
+            if (!currentUser) {
+                console.error("No user logged in");
+                return;
+            }
+            
+            try {
+                const snapshot = await db.collection('users').doc(currentUser.uid)
+                    .collection('game_history')
+                    .orderBy('timestamp', 'desc')
+                    .limit(10)
+                    .get();
+                
+                historyBody.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    historyBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px">No recent games found</td></tr>';
+                    return;
+                }
+                
+                snapshot.forEach(doc => {
+                    const game = doc.data();
+                    const row = document.createElement('tr');
+                    
+                    // Format date and time
+                    const date = new Date(game.timestamp?.toDate() || game.date);
+                    const formattedDate = date.toLocaleDateString();
+                    const formattedTime = date.toLocaleTimeString();
+                    
+                    // Determine result status
+                    let statusText, statusClass;
+                    if (game.resultStatus === "won") {
+                        statusText = "Won";
+                        statusClass = "won";
+                    } else if (game.resultStatus === "partial") {
+                        statusText = "Partial";
+                        statusClass = "partial";
+                    } else {
+                        statusText = "Lost";
+                        statusClass = "lost";
+                    }
+                    
+                    // Create letter display
+                    const lettersHtml = document.createElement('div');
+                    lettersHtml.className = 'user-letters';
+                    
+                    if (game.letterAnalysis) {
+                        game.letterAnalysis.forEach(item => {
+                            const letterSpan = document.createElement('span');
+                            letterSpan.className = `letter ${item.correct ? 'correct' : 'incorrect'}`;
+                            letterSpan.textContent = item.letter;
+                            lettersHtml.appendChild(letterSpan);
+                        });
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${formattedDate}<br>${formattedTime}</td>
+                        <td>${game.targetWord || 'Unknown'}</td>
+                        <td>₦${game.betAmount || 0}</td>
+                        <td></td>
+                        <td><span class="status ${statusClass}">${statusText}</span></td>
+                        <td>₦${game.winnings || 0}</td>
+                    `;
+                    
+                    // Add the letters to the fourth cell
+                    row.cells[3].appendChild(lettersHtml);
+                    
+                    historyBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error loading recent games:", error);
+                historyBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px">Error loading recent games</td></tr>';
+            }
+        }
+
+        // Save game data to Firestore
+        async function saveGameToFirestore(gameData) {
+            if (!currentUser) {
+                console.error("No user logged in");
+                return;
+            }
+            
+            try {
+                // Add user info and timestamp
+                gameData.userId = currentUser.uid;
+                gameData.userName = currentUser.displayName || currentUser.email;
+                gameData.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                
+                // Save to user's game_history subcollection
+                await db.collection('users').doc(currentUser.uid)
+                    .collection('game_history').add(gameData);
+                
+                console.log("Game data saved to Firestore");
+                
+                // Update user balance
+                const newBalance = parseInt(document.querySelector('.user-balance').textContent.replace('₦', '')) + gameData.winnings;
+                document.querySelector('.user-balance').textContent = '₦' + newBalance;
+                
+                await db.collection('users').doc(currentUser.uid).update({
+                    balance: newBalance
+                });
+                
+                return true;
+            } catch (error) {
+                console.error("Error saving game to Firestore:", error);
+                return false;
+            }
         }
 
         // Start the round timer (counts down from 120 seconds)
@@ -1510,6 +1672,26 @@
             
             // Get which letters were correct/incorrect
             const letterAnalysis = analyzeLetters();
+            
+            // Prepare game data for Firestore
+            const gameData = {
+                targetWord: targetWord.toUpperCase(),
+                betAmount: currentBetAmount,
+                resultStatus: resultStatus,
+                winnings: winnings,
+                timeUsed: timeUsed,
+                correctLetters: correctLetters,
+                totalLetters: totalLetters,
+                playerWord: playerWord,
+                letterAnalysis: letterAnalysis,
+                level: currentLevel,
+                date: new Date().toISOString()
+            };
+            
+            // Save to Firestore
+            saveGameToFirestore(gameData);
+            
+            // Add to local history
             addToHistory(targetWord.toUpperCase(), currentBetAmount, resultStatus, winnings, letterAnalysis);
             
             // Show notification
@@ -1588,7 +1770,13 @@
                 lettersHtml.appendChild(letterSpan);
             });
             
+            // Format current date and time
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString();
+            const formattedTime = now.toLocaleTimeString();
+            
             newRow.innerHTML = `
+                <td>${formattedDate}<br>${formattedTime}</td>
                 <td>${word}</td>
                 <td>₦${bet}</td>
                 <td></td>
@@ -1596,8 +1784,8 @@
                 <td>₦${winnings}</td>
             `;
             
-            // Add the letters to the third cell
-            newRow.cells[2].appendChild(lettersHtml);
+            // Add the letters to the fourth cell
+            newRow.cells[3].appendChild(lettersHtml);
             
             // Add to the beginning of the table
             historyBody.insertBefore(newRow, historyBody.firstChild);
