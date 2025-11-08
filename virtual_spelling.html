@@ -1041,9 +1041,9 @@
                         <tr>
                             <th>Date & Time</th>
                             <th>Word</th>
-                            <th>Bet</th>
-                            <th>Letters</th>
-                            <th>Result</th>
+                            <th>Stake</th>
+                            <th>You Spelt</th>
+                            <th>Status</th>
                             <th>Winnings</th>
                         </tr>
                     </thead>
@@ -1621,40 +1621,78 @@
         function endGame(correctLetters, timeUsed) {
             gameActive = false;
             
-            // Calculate winnings based on correct letters
+            // Calculate winnings based on correct letters and level
             const totalLetters = targetWord.length;
-            const failedLetters = totalLetters - correctLetters;
+            const missedLetters = totalLetters - correctLetters;
             
-            // New winning logic:
-            // - If 0 failed letters: full win (2x bet)
-            // - If 1 failed letter: partial win (50% of bet returned)
-            // - If 2 failed letters: partial win (25% of bet returned)
-            // - If 3+ failed letters: no win
+            // New winning logic based on the image provided:
             let winnings = 0;
-            if (failedLetters === 0) {
-                winnings = currentBetAmount * 2;
-            } else if (failedLetters === 1) {
-                winnings = Math.floor(currentBetAmount * 0.5);
-            } else if (failedLetters === 2) {
-                winnings = Math.floor(currentBetAmount * 0.25);
-            } else {
-                winnings = 0;
-            }
-            
-            // Determine result status
             let resultStatus, resultMessage;
-            if (failedLetters === 0) {
+            
+            if (missedLetters === 0) {
+                // Full win - 100% of bet returned
+                winnings = currentBetAmount * 2;
                 resultStatus = "won";
-                resultMessage = `Congratulations! You correctly spelled "<strong>${targetWord.toUpperCase()}</strong>"!`;
-            } else if (failedLetters === 1) {
-                resultStatus = "partial";
-                resultMessage = `You got ${correctLetters} out of ${totalLetters} letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
-            } else if (failedLetters === 2) {
-                resultStatus = "partial";
-                resultMessage = `You got ${correctLetters} out of ${totalLetters} letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                resultMessage = `Perfect! You correctly spelled "<strong>${targetWord.toUpperCase()}</strong>"!`;
             } else {
-                resultStatus = "lost";
-                resultMessage = `You didn't get enough letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                // Check for partial wins based on level and missed letters
+                if (currentLevel === 4 || currentLevel === 5) {
+                    if (missedLetters === 1) {
+                        // Cut 1: 30% deduction (earn 70%)
+                        winnings = Math.floor(currentBetAmount * 1.4);
+                        resultStatus = "partial";
+                        resultMessage = `You got ${correctLetters} out of ${totalLetters} letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                    } else {
+                        // Lost - no winnings
+                        winnings = 0;
+                        resultStatus = "lost";
+                        resultMessage = `You didn't get enough letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                    }
+                } else if (currentLevel === 6 || currentLevel === 7) {
+                    if (missedLetters === 1) {
+                        // Cut 1: 30% deduction (earn 70%)
+                        winnings = Math.floor(currentBetAmount * 1.4);
+                        resultStatus = "partial";
+                        resultMessage = `You got ${correctLetters} out of ${totalLetters} letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                    } else if (missedLetters === 2) {
+                        // Cut 2: 60% deduction (earn 40%)
+                        winnings = Math.floor(currentBetAmount * 0.8);
+                        resultStatus = "partial";
+                        resultMessage = `You got ${correctLetters} out of ${totalLetters} letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                    } else {
+                        // Lost - no winnings
+                        winnings = 0;
+                        resultStatus = "lost";
+                        resultMessage = `You didn't get enough letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                    }
+                } else if (currentLevel >= 8) {
+                    if (missedLetters === 1) {
+                        // Cut 1: 30% deduction (earn 70%)
+                        winnings = Math.floor(currentBetAmount * 1.4);
+                        resultStatus = "partial";
+                        resultMessage = `You got ${correctLetters} out of ${totalLetters} letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                    } else if (missedLetters === 2) {
+                        // Cut 2: 60% deduction (earn 40%)
+                        winnings = Math.floor(currentBetAmount * 0.8);
+                        resultStatus = "partial";
+                        resultMessage = `You got ${correctLetters} out of ${totalLetters} letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                    } else if (missedLetters === 3) {
+                        // Cut 3: 90% deduction (earn 10%)
+                        winnings = Math.floor(currentBetAmount * 0.2);
+                        resultStatus = "partial";
+                        resultMessage = `You got ${correctLetters} out of ${totalLetters} letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                    } else {
+                        // Lost - no winnings
+                        winnings = 0;
+                        resultStatus = "lost";
+                        resultMessage = `You didn't get enough letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                    }
+                } else {
+                    // Level 3 - only full win
+                    winnings = 0;
+                    resultStatus = "lost";
+                    resultMessage = `You didn't get enough letters correct for "<strong>${targetWord.toUpperCase()}</strong>".`;
+                }
             }
             
             // Update results panel
@@ -1667,7 +1705,7 @@
             resultsPanel.classList.add('show');
             
             // Update game stats and history
-            const isFullWin = failedLetters === 0;
+            const isFullWin = missedLetters === 0;
             updateGameStats(isFullWin);
             
             // Get which letters were correct/incorrect
@@ -1695,12 +1733,10 @@
             addToHistory(targetWord.toUpperCase(), currentBetAmount, resultStatus, winnings, letterAnalysis);
             
             // Show notification
-            if (failedLetters === 0) {
+            if (missedLetters === 0) {
                 showNotification(`Perfect! You won ₦${winnings}!`, 'success');
-            } else if (failedLetters === 1) {
+            } else if (winnings > 0) {
                 showNotification(`Good try! You won ₦${winnings} for ${correctLetters} correct letters.`, 'info');
-            } else if (failedLetters === 2) {
-                showNotification(`Good effort! You won ₦${winnings} for ${correctLetters} correct letters.`, 'info');
             } else {
                 showNotification(`Better luck next time! The word was "${targetWord.toUpperCase()}".`, 'error');
             }
